@@ -7,6 +7,10 @@ const authService = require('../services/authService');
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    
+    // Log para depuração
+    console.log('Tentativa de registro:', { name, email });
+    
     const result = await authService.registerUser(name, email, password);
     res.status(201).json(result);
   } catch (error) {
@@ -22,6 +26,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    // Log para depuração
+    console.log('Tentativa de login:', { email });
+    
     const result = await authService.loginUser(email, password);
     
     if (!result) {
@@ -72,6 +80,23 @@ router.post('/refresh', async (req, res) => {
     console.error('Erro ao renovar token:', error);
     res.status(500).json({ message: 'Erro ao renovar token' });
   }
+});
+
+// Rota de teste para fornecer ao cliente informações sobre o backend
+router.get('/status', (req, res) => {
+  res.json({
+    status: 'online',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    databaseConnection: process.env.DATABASE_URL ? 'configurada' : 'não configurada',
+    apiIntegrations: {
+      alphaVantage: process.env.ALPHA_VANTAGE_API_KEY ? 'configurada' : 'não configurada',
+      twelveData: process.env.TWELVE_DATA_API_KEY ? 'configurada' : 'não configurada',
+      yahooFinance: process.env.YAHOO_FINANCE_API_KEY ? 'configurada' : 'não configurada',
+      finnhub: process.env.FINNHUB_API_KEY ? 'configurada' : 'não configurada',
+      metaTrader: process.env.META_TRADER_API_KEY ? 'configurada' : 'não configurada'
+    }
+  });
 });
 
 module.exports = router;

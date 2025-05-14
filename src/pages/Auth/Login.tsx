@@ -1,20 +1,29 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Home } from 'lucide-react';
 import axios from 'axios';
 
 const Login: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>("login");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<string>(tabParam === 'register' ? 'register' : 'login');
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Set initial tab based on URL parameter
+  useEffect(() => {
+    if (tabParam === 'register') {
+      setActiveTab('register');
+    }
+  }, [tabParam]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState<string>("");
@@ -100,7 +109,7 @@ const Login: React.FC = () => {
       toast({
         variant: "destructive",
         title: "Erro no cadastro",
-        description: errorMessage,
+        description: "API de registro não disponível. Use as credenciais de teste ou configure o backend.",
       });
     } finally {
       setLoading(false);
@@ -109,6 +118,16 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full shadow-md"
+          onClick={() => navigate('/')}
+        >
+          <Home className="h-5 w-5" />
+        </Button>
+      </div>
       <div className="w-full max-w-md">
         <Card className="border-none shadow-lg">
           <CardHeader className="space-y-1 text-center">

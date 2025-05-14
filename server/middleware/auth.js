@@ -3,6 +3,13 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 function authenticateToken(req, res, next) {
+  // Se estivermos em ambiente de desenvolvimento, podemos permitir acesso sem token
+  if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+    console.log('Autenticação ignorada em ambiente de desenvolvimento');
+    req.user = { id: 1, email: 'dev@example.com', role: 'admin' };
+    return next();
+  }
+
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 

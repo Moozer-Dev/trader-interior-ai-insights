@@ -20,6 +20,15 @@ import IntegrationsPage from "./pages/admin/IntegrationsPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
+import About from "./pages/About";
+
+// New page imports for the links in footer
+const Contact = () => <About />; // Temporary placeholder
+const Blog = () => <About />; // Temporary placeholder 
+const Careers = () => <About />; // Temporary placeholder
+const Terms = () => <About />; // Temporary placeholder
+const Privacy = () => <About />; // Temporary placeholder
+const Cookies = () => <About />; // Temporary placeholder
 
 const queryClient = new QueryClient();
 
@@ -34,6 +43,15 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth/login" element={<Login />} />
+              
+              {/* Public pages */}
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
               
               <Route element={<PrivateRoute><Dashboard /></PrivateRoute>}>
                 <Route path="/dashboard" element={<DashboardPage />} />
