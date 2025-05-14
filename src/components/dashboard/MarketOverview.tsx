@@ -5,11 +5,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from '@/lib/utils';
 import { useMarketData } from '@/hooks/useMarketData';
+import { useAuth } from "@/contexts/AuthContext";
 
 export const MarketOverview: React.FC = () => {
+  const { user } = useAuth();
   const { data: marketData, isLoading, isError, refetch } = useMarketData();
+  
+  // Verificar se o usuário tem acesso a dados em tempo real
+  const hasRealTimeData = user?.plan === 'pro' || user?.plan === 'api';
 
   return (
     <Card>
@@ -21,16 +27,25 @@ export const MarketOverview: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline">B3</Badge>
+            {hasRealTimeData ? (
+              <Badge variant="outline" className="bg-trader-green/10 text-trader-green">Tempo real</Badge>
+            ) : (
+              <Badge variant="outline" className="bg-amber-500/10 text-amber-500">15min atraso</Badge>
+            )}
             <Button size="sm" variant="ghost" onClick={() => refetch()} disabled={isLoading}>
-              <RefreshCw className="h-3.5 w-3.5" />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="space-y-3">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
           </div>
         ) : isError ? (
           <div className="py-6 text-center">
@@ -54,7 +69,7 @@ export const MarketOverview: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {marketData.topStocks.map((item, index) => (
+              {marketData.topStocks.map((item: any, index: number) => (
                 <TableRow key={index} className="cursor-pointer hover:bg-muted/50">
                   <TableCell>
                     <div>
@@ -66,14 +81,14 @@ export const MarketOverview: React.FC = () => {
                   <TableCell>
                     <div className={cn(
                       "flex items-center",
-                      item.change > 0 ? "text-trader-green" : "text-trader-red"
+                      parseFloat(item.change) > 0 ? "text-trader-green" : "text-trader-red"
                     )}>
-                      {item.change > 0 ? (
+                      {parseFloat(item.change) > 0 ? (
                         <ArrowUp className="h-4 w-4 mr-1" />
                       ) : (
                         <ArrowDown className="h-4 w-4 mr-1" />
                       )}
-                      {Math.abs(item.change)}%
+                      {Math.abs(parseFloat(item.change))}%
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">{item.volume}</TableCell>

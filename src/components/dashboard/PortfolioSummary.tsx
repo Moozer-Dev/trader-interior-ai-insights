@@ -3,12 +3,19 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
+import { ArrowUp, ArrowDown, RefreshCw, Plus } from 'lucide-react';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const PortfolioSummary = () => {
+  const { user } = useAuth();
   const { data: portfolioData, isLoading, isError, refetch } = usePortfolioData();
+  
+  // Verificar se o usuário é gratuito ou premium
+  const isFreeUser = !user?.plan || user.plan === 'free';
+  const hasPlanLimitation = isFreeUser && portfolioData?.assets && portfolioData.assets.length >= 5;
 
   return (
     <div className="space-y-6">
@@ -16,15 +23,28 @@ export const PortfolioSummary = () => {
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
             <CardTitle>Visão Geral do Portfólio</CardTitle>
-            <Button size="sm" variant="ghost" onClick={() => refetch()} disabled={isLoading}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+              {hasPlanLimitation && (
+                <Badge variant="outline" className="bg-amber-500/10 text-amber-500">
+                  Limite do plano free
+                </Badge>
+              )}
+              <Button size="sm" variant="ghost" onClick={() => refetch()} disabled={isLoading}>
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between gap-8">
+                <div className="space-y-6 w-full">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+                <Skeleton className="h-[200px] w-full sm:w-3/5" />
+              </div>
             </div>
           ) : isError ? (
             <div className="py-6 text-center">
@@ -34,8 +54,12 @@ export const PortfolioSummary = () => {
               </Button>
             </div>
           ) : !portfolioData ? (
-            <div className="py-6 text-center">
-              <p className="text-muted-foreground">Nenhum dado disponível no momento</p>
+            <div className="py-10 text-center">
+              <p className="text-muted-foreground mb-4">Você ainda não possui ativos no seu portfólio</p>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Ativo
+              </Button>
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row justify-between gap-8">
@@ -107,15 +131,25 @@ export const PortfolioSummary = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle>Ativos no Portfólio</CardTitle>
-            <Badge variant="outline">
-              {portfolioData?.assets ? `${portfolioData.assets.length} ativos` : '0 ativos'}
-            </Badge>
+            <div className="flex gap-2 items-center">
+              <Badge variant="outline">
+                {portfolioData?.assets ? `${portfolioData.assets.length} ativos` : '0 ativos'}
+              </Badge>
+              
+              <Button size="sm" disabled={hasPlanLimitation}>
+                <Plus className="h-4 w-4 mr-1" />
+                <span>Adicionar</span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
             </div>
           ) : isError ? (
             <div className="py-6 text-center">
@@ -132,39 +166,49 @@ export const PortfolioSummary = () => {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left border-b border-border">
-                    <th className="pb-2">Ativo</th>
-                    <th className="pb-2">Preço</th>
-                    <th className="pb-2">Variação</th>
-                    <th className="pb-2">Quantidade</th>
-                    <th className="pb-2 text-right">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {portfolioData.assets.map((asset, index) => (
-                    <tr key={index} className="border-b border-border">
-                      <td className="py-3 font-medium">{asset.symbol}</td>
-                      <td>R$ {asset.price.toFixed(2)}</td>
-                      <td>
-                        <div className={`flex items-center ${asset.change >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
-                          {asset.change >= 0 ? (
-                            <ArrowUp className="h-3 w-3 mr-1" />
-                          ) : (
-                            <ArrowDown className="h-3 w-3 mr-1" />
-                          )}
-                          {Math.abs(asset.change)}%
-                        </div>
-                      </td>
-                      <td>{asset.quantity}</td>
-                      <td className="text-right">R$ {asset.total.toFixed(2)}</td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left border-b border-border">
+                      <th className="pb-2">Ativo</th>
+                      <th className="pb-2">Preço</th>
+                      <th className="pb-2">Variação</th>
+                      <th className="pb-2">Quantidade</th>
+                      <th className="pb-2 text-right">Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {portfolioData.assets.map((asset: any, index: number) => (
+                      <tr key={index} className="border-b border-border">
+                        <td className="py-3 font-medium">{asset.symbol}</td>
+                        <td>R$ {asset.price.toFixed(2)}</td>
+                        <td>
+                          <div className={`flex items-center ${asset.change >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
+                            {asset.change >= 0 ? (
+                              <ArrowUp className="h-3 w-3 mr-1" />
+                            ) : (
+                              <ArrowDown className="h-3 w-3 mr-1" />
+                            )}
+                            {Math.abs(asset.change)}%
+                          </div>
+                        </td>
+                        <td>{asset.quantity}</td>
+                        <td className="text-right">R$ {asset.total.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {hasPlanLimitation && (
+                <div className="mt-4 p-3 bg-amber-50 text-amber-800 rounded-md text-sm">
+                  <p className="font-medium">Limite do plano gratuito atingido</p>
+                  <p className="mt-1">Você atingiu o limite de 5 ativos do plano gratuito. Faça upgrade para o plano Pro para adicionar mais ativos.</p>
+                  <Button size="sm" className="mt-2">Fazer Upgrade</Button>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

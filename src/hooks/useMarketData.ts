@@ -1,33 +1,25 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+import axios from 'axios';
+import { useAuth } from '@/contexts/AuthContext';
 
-export interface MarketStock {
-  symbol: string;
-  name: string;
-  price: string;
-  change: number;
-  volume: string;
-}
+export function useMarketData() {
+  const { user } = useAuth();
+  
+  // Verificar se o usuário tem acesso a dados em tempo real
+  const hasRealTimeData = user?.plan === 'pro' || user?.plan === 'api';
 
-export interface MarketData {
-  topStocks: MarketStock[];
-  stocks: MarketStock[];
-  crypto: MarketStock[];
-  forex: MarketStock[];
-  lastUpdated: string;
-}
-
-const fetchMarketData = async (): Promise<MarketData> => {
-  const response = await apiClient.get('/api/market/data');
-  return response.data;
-};
-
-export const useMarketData = () => {
   return useQuery({
-    queryKey: ['marketData'],
-    queryFn: fetchMarketData,
-    refetchInterval: 60000, // Atualiza a cada minuto
-    staleTime: 30000, // Considera dados obsoletos após 30 segundos
+    queryKey: ['marketData', hasRealTimeData],
+    queryFn: async () => {
+      const response = await axios.get('/api/market/overview', {
+        params: { 
+          realtime: hasRealTimeData 
+        }
+      });
+      return response.data;
+    },
+    refetchInterval: hasRealTimeData ? 10000 : 60000, // Atualizar com maior frequência para usuários premium
+    staleTime: hasRealTimeData ? 5000 : 60000
   });
-};
+}
