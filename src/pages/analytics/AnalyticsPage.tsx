@@ -1,26 +1,16 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowUp, ArrowDown, ChartBar } from 'lucide-react';
+import { ChartBar } from 'lucide-react';
 import { AiPricePredictor } from '@/components/analytics/AiPricePredictor';
 import { AiPortfolioSuggestion } from '@/components/analytics/AiPortfolioSuggestion';
 import { AiTechnicalAnalysis } from '@/components/analytics/AiTechnicalAnalysis';
+import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 
 const AnalyticsPage: React.FC = () => {
-  const [apiConfigured, setApiConfigured] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-
-  const handleConfigureApi = () => {
-    if (apiKey.trim().length > 0) {
-      setApiConfigured(true);
-      // Aqui você salvaria a chave de API e configuraria as integrações reais
-      console.log("API configurada com sucesso");
-    }
-  };
+  const { isLoading, isError } = useAnalyticsData();
 
   return (
     <div className="space-y-6">
@@ -34,26 +24,39 @@ const AnalyticsPage: React.FC = () => {
         </Badge>
       </div>
 
-      {!apiConfigured ? (
+      {isLoading ? (
         <Card>
           <CardHeader>
-            <CardTitle>Configure a API de Análise</CardTitle>
+            <CardTitle>Carregando Análises</CardTitle>
             <CardDescription>
-              Para usar os recursos de análise com IA, configure sua chave de API
+              Aguarde enquanto carregamos os modelos de IA para análise
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="apiKey">Chave da API</label>
-                <Input 
-                  id="apiKey" 
-                  placeholder="Insira sua chave da API" 
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-              </div>
-              <Button onClick={handleConfigureApi}>Configurar API</Button>
+            <div className="py-8 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <h3 className="text-lg font-medium mb-2">Inicializando modelos de IA</h3>
+              <p className="text-muted-foreground">
+                Isso pode levar alguns instantes...
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : isError ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Erro ao Carregar Análises</CardTitle>
+            <CardDescription>
+              Não foi possível carregar os modelos de análise de IA
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="py-8 text-center">
+              <ChartBar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Serviço temporariamente indisponível</h3>
+              <p className="text-muted-foreground mb-4">
+                Estamos trabalhando para resolver o problema. Por favor, tente novamente mais tarde.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -82,16 +85,15 @@ const AnalyticsPage: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Detector de Padrões de Mercado</CardTitle>
-                <CardDescription>Este recurso estará disponível após integração com API</CardDescription>
+                <CardDescription>Este recurso estará disponível em breve</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="py-8 text-center">
                   <ChartBar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Dados em tempo real necessários</h3>
+                  <h3 className="text-lg font-medium mb-2">Em desenvolvimento</h3>
                   <p className="text-muted-foreground mb-4">
-                    Este recurso requer integração com API de dados em tempo real para funcionar corretamente.
+                    Este recurso será lançado na próxima atualização da plataforma.
                   </p>
-                  <Button variant="outline">Saiba mais sobre integração</Button>
                 </div>
               </CardContent>
             </Card>

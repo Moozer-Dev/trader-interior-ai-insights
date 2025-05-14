@@ -1,83 +1,105 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ArrowUp, ArrowDown } from 'lucide-react';
-
-const portfolioData = [
-  { name: 'Jan', value: 10000 },
-  { name: 'Fev', value: 12000 },
-  { name: 'Mar', value: 9800 },
-  { name: 'Abr', value: 11200 },
-  { name: 'Mai', value: 13500 },
-  { name: 'Jun', value: 14800 },
-  { name: 'Jul', value: 16000 },
-];
-
-const assets = [
-  { id: 1, name: 'PETR4', price: 28.45, change: 2.3, amount: 100, total: 2845.00 },
-  { id: 2, name: 'VALE3', price: 67.82, change: -1.4, amount: 50, total: 3391.00 },
-  { id: 3, name: 'ITUB4', price: 32.17, change: 0.8, amount: 120, total: 3860.40 },
-  { id: 4, name: 'BBDC4', price: 18.23, change: 1.2, amount: 200, total: 3646.00 },
-];
+import { ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
 export const PortfolioSummary = () => {
+  const { data: portfolioData, isLoading, isError, refetch } = usePortfolioData();
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle>Visão Geral do Portfólio</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Visão Geral do Portfólio</CardTitle>
+            <Button size="sm" variant="ghost" onClick={() => refetch()} disabled={isLoading}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row justify-between gap-8">
-            <div className="space-y-6">
-              <div>
-                <div className="text-muted-foreground mb-2">Valor Total</div>
-                <div className="text-3xl font-bold">R$ 25.689,45</div>
-                <div className="flex items-center text-trader-green mt-1">
-                  <ArrowUp className="h-4 w-4 mr-1" />
-                  <span className="text-sm">2,4% (este mês)</span>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : isError ? (
+            <div className="py-6 text-center">
+              <p className="text-muted-foreground">Erro ao carregar dados do portfólio</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
+                Tentar novamente
+              </Button>
+            </div>
+          ) : !portfolioData ? (
+            <div className="py-6 text-center">
+              <p className="text-muted-foreground">Nenhum dado disponível no momento</p>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row justify-between gap-8">
+              <div className="space-y-6">
+                <div>
+                  <div className="text-muted-foreground mb-2">Valor Total</div>
+                  <div className="text-3xl font-bold">R$ {portfolioData.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className={`flex items-center ${portfolioData.monthlyChange >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
+                    {portfolioData.monthlyChange >= 0 ? (
+                      <ArrowUp className="h-4 w-4 mr-1" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4 mr-1" />
+                    )}
+                    <span className="text-sm">{Math.abs(portfolioData.monthlyChange).toFixed(1)}% (este mês)</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="text-muted-foreground mb-2">Retorno Total</div>
+                  <div className="text-2xl font-bold">R$ {portfolioData.totalReturn.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className={`flex items-center ${portfolioData.totalReturnPercentage >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
+                    {portfolioData.totalReturnPercentage >= 0 ? (
+                      <ArrowUp className="h-4 w-4 mr-1" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4 mr-1" />
+                    )}
+                    <span className="text-sm">{Math.abs(portfolioData.totalReturnPercentage).toFixed(1)}% (desde o início)</span>
+                  </div>
                 </div>
               </div>
               
-              <div>
-                <div className="text-muted-foreground mb-2">Retorno Total</div>
-                <div className="text-2xl font-bold">R$ 3.245,18</div>
-                <div className="flex items-center text-trader-green mt-1">
-                  <ArrowUp className="h-4 w-4 mr-1" />
-                  <span className="text-sm">14,5% (desde o início)</span>
-                </div>
+              <div className="w-full sm:w-3/5 h-[200px]">
+                {portfolioData.historicalData && portfolioData.historicalData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={portfolioData.historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: '0.5rem'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        name="Valor (R$)"
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2}
+                        dot={{ stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 4, fill: 'hsl(var(--background))' }}
+                        activeDot={{ stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 6, fill: 'hsl(var(--primary))' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-muted-foreground">Dados históricos não disponíveis</p>
+                  </div>
+                )}
               </div>
             </div>
-            
-            <div className="w-full sm:w-3/5 h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={portfolioData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
-                      borderColor: 'hsl(var(--border))',
-                      borderRadius: '0.5rem'
-                    }} 
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    name="Valor (R$)"
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    dot={{ stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 4, fill: 'hsl(var(--background))' }}
-                    activeDot={{ stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 6, fill: 'hsl(var(--primary))' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
       
@@ -85,43 +107,65 @@ export const PortfolioSummary = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle>Ativos no Portfólio</CardTitle>
-            <Badge variant="outline">4 ativos</Badge>
+            <Badge variant="outline">
+              {portfolioData?.assets ? `${portfolioData.assets.length} ativos` : '0 ativos'}
+            </Badge>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left border-b border-border">
-                  <th className="pb-2">Ativo</th>
-                  <th className="pb-2">Preço</th>
-                  <th className="pb-2">Variação</th>
-                  <th className="pb-2">Quantidade</th>
-                  <th className="pb-2 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assets.map((asset) => (
-                  <tr key={asset.id} className="border-b border-border">
-                    <td className="py-3 font-medium">{asset.name}</td>
-                    <td>R$ {asset.price.toFixed(2)}</td>
-                    <td>
-                      <div className={`flex items-center ${asset.change >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
-                        {asset.change >= 0 ? (
-                          <ArrowUp className="h-3 w-3 mr-1" />
-                        ) : (
-                          <ArrowDown className="h-3 w-3 mr-1" />
-                        )}
-                        {Math.abs(asset.change)}%
-                      </div>
-                    </td>
-                    <td>{asset.amount}</td>
-                    <td className="text-right">R$ {asset.total.toFixed(2)}</td>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : isError ? (
+            <div className="py-6 text-center">
+              <p className="text-muted-foreground">Erro ao carregar dados dos ativos</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
+                Tentar novamente
+              </Button>
+            </div>
+          ) : !portfolioData?.assets || portfolioData.assets.length === 0 ? (
+            <div className="py-6 text-center">
+              <p className="text-muted-foreground">Nenhum ativo no portfólio</p>
+              <Button variant="outline" size="sm" className="mt-2">
+                Adicionar ativo
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b border-border">
+                    <th className="pb-2">Ativo</th>
+                    <th className="pb-2">Preço</th>
+                    <th className="pb-2">Variação</th>
+                    <th className="pb-2">Quantidade</th>
+                    <th className="pb-2 text-right">Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {portfolioData.assets.map((asset, index) => (
+                    <tr key={index} className="border-b border-border">
+                      <td className="py-3 font-medium">{asset.symbol}</td>
+                      <td>R$ {asset.price.toFixed(2)}</td>
+                      <td>
+                        <div className={`flex items-center ${asset.change >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
+                          {asset.change >= 0 ? (
+                            <ArrowUp className="h-3 w-3 mr-1" />
+                          ) : (
+                            <ArrowDown className="h-3 w-3 mr-1" />
+                          )}
+                          {Math.abs(asset.change)}%
+                        </div>
+                      </td>
+                      <td>{asset.quantity}</td>
+                      <td className="text-right">R$ {asset.total.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
