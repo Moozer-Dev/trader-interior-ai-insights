@@ -29,7 +29,7 @@ const Dashboard = () => {
         <div className="flex flex-1 w-full">
           <Sidebar className="border-r">
             <SidebarContent>
-              <SidebarGroup defaultOpen>
+              <SidebarGroup>
                 <SidebarGroupLabel>Principal</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
