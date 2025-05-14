@@ -117,68 +117,84 @@ export const AlertHistoryList: React.FC = () => {
               <SelectItem value="month">Este mês</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">Exportar</Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {alertHistory.map((day) => (
             <div key={day.id} className="space-y-3">
               <div className="sticky top-0 bg-background z-10 py-1">
-                <h3 className="text-sm font-medium">{day.date}</h3>
+                <h3 className="font-medium text-sm text-muted-foreground">{day.date}</h3>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {day.events.map((event) => (
-                  <div key={event.id} className="flex items-start gap-3 border-b pb-3 last:border-0">
-                    <div className="text-xs text-muted-foreground w-12">{event.time}</div>
-                    <div className={cn(
-                      "h-full flex flex-col items-center",
-                      event.status === 'triggered' ? "text-trader-green" : "text-muted-foreground"
-                    )}>
-                      <div className="w-2 h-2 rounded-full bg-current"></div>
-                      <div className="flex-1 w-[1px] bg-current my-1"></div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="font-medium">{event.asset}</div>
-                          <div className="text-sm">
-                            {event.type === 'price-above' && (
-                              <div className="flex items-center text-muted-foreground">
-                                <ArrowUp className="h-3 w-3 mr-1 text-trader-green" />
-                                <span>Acima de {event.threshold}</span>
-                              </div>
-                            )}
-                            {event.type === 'price-below' && (
-                              <div className="flex items-center text-muted-foreground">
-                                <ArrowDown className="h-3 w-3 mr-1 text-trader-red" />
-                                <span>Abaixo de {event.threshold}</span>
-                              </div>
-                            )}
-                            {event.type === 'volume-above' && (
-                              <div className="flex items-center text-muted-foreground">
-                                <ChartBar className="h-3 w-3 mr-1 text-trader-blue" />
-                                <span>Volume > {event.threshold}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <Badge variant={event.status === 'triggered' ? 'default' : 'outline'}>
+                  <div 
+                    key={event.id} 
+                    className={cn(
+                      "p-3 border rounded-lg",
+                      event.status === 'triggered' ? "bg-muted/30" : ""
+                    )}
+                  >
+                    <div className="flex justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">{event.time}</span>
+                        <span className="text-xs"> • </span>
+                        <Badge 
+                          variant={event.status === 'triggered' ? 'default' : 'outline'}
+                          className="text-xs"
+                        >
                           {event.status === 'triggered' ? 'Acionado' : 'Criado'}
                         </Badge>
                       </div>
-                      {event.status === 'triggered' && (
-                        <div className="mt-2 text-sm flex items-center">
-                          <span className="text-muted-foreground mr-1">Valor acionado:</span>
-                          <span className="font-medium">{event.value}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium flex items-center">
+                          <span className="mr-2">{event.asset}</span>
+                          {event.type === 'price-above' && (
+                            <div className="flex items-center text-xs text-trader-green">
+                              <ArrowUp className="h-3 w-3 mr-1" />
+                              <span>Acima de {event.threshold}</span>
+                            </div>
+                          )}
+                          {event.type === 'price-below' && (
+                            <div className="flex items-center text-xs text-trader-red">
+                              <ArrowDown className="h-3 w-3 mr-1" />
+                              <span>Abaixo de {event.threshold}</span>
+                            </div>
+                          )}
+                          {event.type === 'volume-above' && (
+                            <div className="flex items-center text-xs text-trader-blue">
+                              <ChartBar className="h-3 w-3 mr-1" />
+                              <span>Volume > {event.threshold}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        {event.value !== '-' && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Valor acionado: {event.value}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        {event.status === 'triggered' ? (
+                          <Button size="sm" variant="ghost">Recriar</Button>
+                        ) : (
+                          <Button size="sm" variant="ghost">Editar</Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ))}
+        </div>
+        
+        <div className="mt-6 text-center">
+          <Button variant="outline">Carregar Mais</Button>
         </div>
       </CardContent>
     </Card>

@@ -1,70 +1,48 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { DownloadCloud, CalendarRange, ArrowUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { ArrowUp, ArrowDown, Download } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-// Mock data for revenue
+// Mock data
+const usageData = [
+  { month: 'Jan', apiCalls: 182450, alerts: 5840, aiAnalyses: 2400 },
+  { month: 'Fev', apiCalls: 195600, alerts: 6320, aiAnalyses: 2650 },
+  { month: 'Mar', apiCalls: 210450, alerts: 7100, aiAnalyses: 3200 },
+  { month: 'Abr', apiCalls: 215800, alerts: 7450, aiAnalyses: 3450 },
+  { month: 'Mai', apiCalls: 230700, alerts: 8200, aiAnalyses: 3800 },
+  { month: 'Jun', apiCalls: 248500, alerts: 8840, aiAnalyses: 4250 },
+];
+
 const revenueData = [
-  { month: 'Jan', revenue: 15200, users: 120 },
-  { month: 'Fev', revenue: 16800, users: 145 },
-  { month: 'Mar', revenue: 18500, users: 175 },
-  { month: 'Abr', revenue: 22300, users: 210 },
-  { month: 'Mai', revenue: 26700, users: 240 },
-  { month: 'Jun', revenue: 28900, users: 265 },
-  { month: 'Jul', revenue: 31200, users: 290 },
-  { month: 'Ago', revenue: 35800, users: 320 },
-  { month: 'Set', revenue: 39500, users: 355 },
-  { month: 'Out', revenue: 42100, users: 385 },
-  { month: 'Nov', revenue: 45800, users: 410 },
-  { month: 'Dez', revenue: 48200, users: 430 },
+  { month: 'Jan', revenue: 7020, costs: 2850, profit: 4170 },
+  { month: 'Fev', revenue: 7480, costs: 2920, profit: 4560 },
+  { month: 'Mar', revenue: 8220, costs: 3150, profit: 5070 },
+  { month: 'Abr', revenue: 8840, costs: 3280, profit: 5560 },
+  { month: 'Mai', revenue: 9750, costs: 3510, profit: 6240 },
+  { month: 'Jun', revenue: 11120, costs: 3820, profit: 7300 },
 ];
 
-// Mock data for user distribution
-const userDistributionData = [
-  { name: 'Free', value: 1240, color: '#1E3A8A' },
-  { name: 'Pro', value: 560, color: 'hsl(var(--accent))' },
-  { name: 'API', value: 42, color: '#DC2626' },
+const userSegmentation = [
+  { name: 'Pessoa Física', value: 65, color: '#3b82f6' },
+  { name: 'Day Trader', value: 18, color: '#10b981' },
+  { name: 'Empresas', value: 12, color: '#6366f1' },
+  { name: 'Instituições', value: 5, color: '#f59e0b' },
 ];
 
-// Mock data for conversions
-const conversionData = [
-  { week: 'Semana 1', visitors: 2450, signups: 320, conversions: 42 },
-  { week: 'Semana 2', visitors: 2800, signups: 380, conversions: 51 },
-  { week: 'Semana 3', visitors: 3200, signups: 410, conversions: 56 },
-  { week: 'Semana 4', visitors: 2950, signups: 390, conversions: 48 },
-];
-
-// Most active users
-const activeUsersData = [
-  { id: 1, name: 'João Silva', plan: 'Pro', logins: 87, lastActive: '5 minutos atrás', actions: 342 },
-  { id: 2, name: 'Maria Oliveira', plan: 'Pro', logins: 73, lastActive: '1 hora atrás', actions: 287 },
-  { id: 3, name: 'Pedro Santos', plan: 'API', logins: 65, lastActive: '30 minutos atrás', actions: 256 },
-  { id: 4, name: 'Ana Costa', plan: 'Free', logins: 62, lastActive: '2 horas atrás', actions: 231 },
-  { id: 5, name: 'Carlos Ferreira', plan: 'Pro', logins: 58, lastActive: '1 dia atrás', actions: 215 },
-];
-
-const ReportsPage = () => {
+const ReportsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Relatórios</h1>
-          <p className="text-muted-foreground">Análise de uso e faturamento</p>
+          <p className="text-muted-foreground">Análise de desempenho e métricas</p>
         </div>
         <div className="flex items-center gap-2 self-start">
-          <Button variant="outline" className="flex items-center gap-2">
-            <CalendarRange className="h-4 w-4" />
-            Último mês
-          </Button>
-          <Button className="flex items-center gap-2">
-            <DownloadCloud className="h-4 w-4" />
+          <Button className="gap-2">
+            <Download className="h-4 w-4" />
             Exportar Dados
           </Button>
         </div>
@@ -77,127 +55,250 @@ const ReportsPage = () => {
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
-              <div className="text-2xl font-bold">R$ 48.200,00</div>
-              <Badge variant="outline" className="bg-accent/20 text-accent-foreground">
-                +5,2% em relação ao mês anterior
-              </Badge>
+              <div className="text-2xl font-bold">R$ 11.120,00</div>
+              <div className="flex items-center text-trader-green">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">14,1%</span>
+              </div>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Comparado ao mês anterior
             </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Usuários Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Número de Usuários</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
-              <div className="text-2xl font-bold">1.842</div>
-              <Badge variant="outline" className="bg-accent/20 text-accent-foreground">
-                +4,9% em relação ao mês anterior
-              </Badge>
+              <div className="text-2xl font-bold">548</div>
+              <div className="flex items-center text-trader-green">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">5,8%</span>
+              </div>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Crescimento mensal
             </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Taxa de Conversão</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Chamadas API</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
-              <div className="text-2xl font-bold">13,2%</div>
-              <Badge variant="outline" className="bg-accent/20 text-accent-foreground">
-                +1,5% em relação ao mês anterior
-              </Badge>
+              <div className="text-2xl font-bold">248.500</div>
+              <div className="flex items-center text-trader-green">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="text-sm">7,7%</span>
+              </div>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Total do último mês
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs defaultValue="usage" className="space-y-6">
         <TabsList className="w-full">
-          <TabsTrigger value="overview" className="flex-1">Visão Geral</TabsTrigger>
-          <TabsTrigger value="revenue" className="flex-1">Receita</TabsTrigger>
+          <TabsTrigger value="usage" className="flex-1">Uso</TabsTrigger>
+          <TabsTrigger value="finance" className="flex-1">Financeiro</TabsTrigger>
           <TabsTrigger value="users" className="flex-1">Usuários</TabsTrigger>
-          <TabsTrigger value="engagement" className="flex-1">Engajamento</TabsTrigger>
+          <TabsTrigger value="performance" className="flex-1">Performance</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="md:col-span-2">
+        <TabsContent value="usage">
+          <div className="grid grid-cols-1 gap-6">
+            <Card>
               <CardHeader>
-                <CardTitle>Receita vs. Usuários</CardTitle>
-                <CardDescription>Análise da receita e crescimento de usuários nos últimos 12 meses</CardDescription>
+                <CardTitle>Uso da Plataforma</CardTitle>
+                <CardDescription>Métricas de utilização nos últimos 6 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[350px]">
+                <div className="h-[400px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenueData}>
+                    <LineChart
+                      data={usageData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" />
-                      <YAxis yAxisId="left" orientation="left" stroke="hsl(var(--primary))" />
-                      <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" />
-                      <Tooltip 
+                      <YAxis />
+                      <Tooltip
                         contentStyle={{
                           backgroundColor: 'hsl(var(--card))',
                           borderColor: 'hsl(var(--border))',
                           borderRadius: '0.5rem'
                         }}
-                        formatter={(value: number, name: string) => [
-                          name === 'revenue' ? `R$ ${value.toLocaleString('pt-BR')}` : value,
-                          name === 'revenue' ? 'Receita' : 'Usuários'
-                        ]}
                       />
                       <Legend />
-                      <Line 
-                        yAxisId="left"
-                        type="monotone" 
-                        dataKey="revenue" 
-                        name="Receita" 
-                        stroke="hsl(var(--primary))" 
+                      <Line
+                        type="monotone"
+                        dataKey="apiCalls"
+                        name="Chamadas API"
+                        stroke="hsl(var(--primary))"
                         strokeWidth={2}
-                        dot={{ stroke: 'hsl(var(--primary))', strokeWidth: 2, r: 4, fill: 'hsl(var(--background))' }}
+                        activeDot={{ r: 8 }}
                       />
-                      <Line 
-                        yAxisId="right"
-                        type="monotone" 
-                        dataKey="users" 
-                        name="Usuários" 
-                        stroke="hsl(var(--accent))" 
+                      <Line
+                        type="monotone"
+                        dataKey="alerts"
+                        name="Alertas"
+                        stroke="hsl(var(--accent))"
                         strokeWidth={2}
-                        dot={{ stroke: 'hsl(var(--accent))', strokeWidth: 2, r: 4, fill: 'hsl(var(--background))' }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="aiAnalyses"
+                        name="Análises IA"
+                        stroke="#1E3A8A"
+                        strokeWidth={2}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Total de Chamadas API</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">1.283.500</div>
+                      <p className="text-xs text-muted-foreground">Nos últimos 6 meses</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Alertas Criados</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">43.750</div>
+                      <p className="text-xs text-muted-foreground">Nos últimos 6 meses</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Análises com IA</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">19.750</div>
+                      <p className="text-xs text-muted-foreground">Nos últimos 6 meses</p>
+                    </CardContent>
+                  </Card>
+                </div>
               </CardContent>
             </Card>
-            
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="finance">
+          <div className="grid grid-cols-1 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Distribuição de Usuários</CardTitle>
-                <CardDescription>Por plano de assinatura</CardDescription>
+                <CardTitle>Relatório Financeiro</CardTitle>
+                <CardDescription>Receitas, custos e lucro nos últimos 6 meses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={revenueData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: '0.5rem'
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="revenue" name="Receita" fill="hsl(var(--accent))" />
+                      <Bar dataKey="costs" name="Custos" fill="hsl(var(--destructive))" />
+                      <Bar dataKey="profit" name="Lucro" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Receita Total</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">R$ 52.430,00</div>
+                      <div className="flex items-center text-xs text-trader-green mt-1">
+                        <ArrowUp className="h-3 w-3 mr-1" />
+                        <span>10,2% de crescimento</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Custos Operacionais</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">R$ 19.530,00</div>
+                      <div className="flex items-center text-xs text-trader-red mt-1">
+                        <ArrowUp className="h-3 w-3 mr-1" />
+                        <span>4,8% de aumento</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Lucro Líquido</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="text-2xl font-bold">R$ 32.900,00</div>
+                      <div className="flex items-center text-xs text-trader-green mt-1">
+                        <ArrowUp className="h-3 w-3 mr-1" />
+                        <span>14,5% de crescimento</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="users">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Segmentação de Usuários</CardTitle>
+                <CardDescription>Distribuição por perfil de cliente</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={userDistributionData}
-                        dataKey="value"
-                        nameKey="name"
+                        data={userSegmentation}
                         cx="50%"
                         cy="50%"
-                        outerRadius={100}
-                        fill="#8884d8"
+                        labelLine={false}
+                        outerRadius={120}
+                        dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       >
-                        {userDistributionData.map((entry, index) => (
+                        {userSegmentation.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip 
-                        formatter={(value: number) => [`${value} usuários`, '']}
+                      <Tooltip
+                        formatter={(value) => [`${value}%`, 'Porcentagem']}
                         contentStyle={{
                           backgroundColor: 'hsl(var(--card))',
                           borderColor: 'hsl(var(--border))',
@@ -212,121 +313,184 @@ const ReportsPage = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Conversões Semanais</CardTitle>
-                <CardDescription>Visitantes, cadastros e conversões</CardDescription>
+                <CardTitle>Métricas de Usuários</CardTitle>
+                <CardDescription>Indicadores de engajamento e retenção</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={conversionData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="week" />
-                      <YAxis />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: '0.5rem'
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="visitors" name="Visitantes" fill="#1E3A8A" />
-                      <Bar dataKey="signups" name="Cadastros" fill="hsl(var(--primary))" />
-                      <Bar dataKey="conversions" name="Conversões" fill="hsl(var(--accent))" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <h3 className="text-sm font-medium">Taxa de Ativação</h3>
+                      <span className="text-sm">78%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="bg-primary h-2 rounded-full" style={{ width: '78%' }}></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Percentual de usuários que completaram o onboarding e criaram pelo menos um alerta.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <h3 className="text-sm font-medium">Retenção em 30 dias</h3>
+                      <span className="text-sm">72%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="bg-accent h-2 rounded-full" style={{ width: '72%' }}></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Percentual de usuários que continuam ativos após 30 dias.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <h3 className="text-sm font-medium">Churn Rate</h3>
+                      <span className="text-sm">4.2%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="bg-destructive h-2 rounded-full" style={{ width: '4.2%' }}></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Taxa de cancelamento mensal.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <h3 className="text-sm font-medium">Conversão Free para Pro</h3>
+                      <span className="text-sm">18%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="bg-primary h-2 rounded-full" style={{ width: '18%' }}></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Taxa de conversão de usuários gratuitos para plano pago.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
         
-        <TabsContent value="revenue">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Análise de Receita</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px]">
-                  {/* Revenue content */}
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance do Sistema</CardTitle>
+              <CardDescription>Métricas de disponibilidade e tempo de resposta</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <Card>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm">Uptime</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-0">
+                    <div className="text-2xl font-bold">99.98%</div>
+                    <p className="text-xs text-muted-foreground">Nos últimos 30 dias</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm">Tempo de Resposta API</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-0">
+                    <div className="text-2xl font-bold">120ms</div>
+                    <p className="text-xs text-muted-foreground">Média do último mês</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm">Erros API</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-0">
+                    <div className="text-2xl font-bold">0.03%</div>
+                    <p className="text-xs text-muted-foreground">Taxa de falhas</p>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-base font-medium mb-4">Monitoramento de Disponibilidade</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium">API Principal</h4>
+                        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                          Online
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Tempo de resposta</span>
+                          <span>120ms</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Uptime</span>
+                          <span>99.98%</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Último incidente</span>
+                          <span>15 dias atrás</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium">Serviço de IA</h4>
+                        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                          Online
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Tempo de resposta</span>
+                          <span>580ms</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Uptime</span>
+                          <span>99.95%</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Último incidente</span>
+                          <span>3 dias atrás</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium">Sistema de Alertas</h4>
+                        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                          Online
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Tempo de processamento</span>
+                          <span>210ms</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Uptime</span>
+                          <span>99.99%</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Último incidente</span>
+                          <span>30 dias atrás</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="users">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Análise de Usuários</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px]">
-                  {/* Users content */}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="engagement">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Análise de Engajamento</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px]">
-                  {/* Engagement content */}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Usuários Mais Ativos</CardTitle>
-          <CardDescription>Usuários com maior número de interações nos últimos 30 dias</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Usuário</TableHead>
-                <TableHead>Plano</TableHead>
-                <TableHead>Logins</TableHead>
-                <TableHead>Ações</TableHead>
-                <TableHead>Última Atividade</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {activeUsersData.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>
-                    <Badge variant={
-                      user.plan === 'Pro' ? 'default' :
-                      user.plan === 'API' ? 'secondary' : 'outline'
-                    }>
-                      {user.plan}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{user.logins}</TableCell>
-                  <TableCell>{user.actions}</TableCell>
-                  <TableCell>{user.lastActive}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className="border-t py-4">
-          <Button variant="outline" className="w-full">Ver Todos os Usuários</Button>
-        </CardFooter>
-      </Card>
     </div>
   );
 };
