@@ -19,36 +19,35 @@ import IntegrationsPage from "./pages/admin/IntegrationsPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Dashboard Routes */}
-          <Route element={<Dashboard />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/markets" element={<MarketsPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/alerts" element={<AlertsPage />} />
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
             
-            {/* Admin Routes */}
-            <Route path="/admin/users" element={<UsersPage />} />
-            <Route path="/admin/plans" element={<PlansPage />} />
-            <Route path="/admin/reports" element={<ReportsPage />} />
-            <Route path="/admin/integrations" element={<IntegrationsPage />} />
-          </Route>
-          
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            <Route element={<Dashboard />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/markets" element={<MarketsPage />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/alerts" element={<AlertsPage />} />
+              
+              <Route path="/admin/users" element={<UsersPage />} />
+              <Route path="/admin/plans" element={<PlansPage />} />
+              <Route path="/admin/reports" element={<ReportsPage />} />
+              <Route path="/admin/integrations" element={<IntegrationsPage />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

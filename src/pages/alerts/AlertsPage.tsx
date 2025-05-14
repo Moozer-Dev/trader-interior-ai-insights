@@ -223,7 +223,7 @@ const AlertsPage: React.FC = () => {
                           {alert.type === 'volume-above' && (
                             <div className="flex items-center">
                               <ChartBar className="h-3 w-3 text-trader-blue mr-1" />
-                              <span>Volume > {alert.threshold}</span>
+                              <span>Volume {'>'} {alert.threshold}</span>
                             </div>
                           )}
                         </div>

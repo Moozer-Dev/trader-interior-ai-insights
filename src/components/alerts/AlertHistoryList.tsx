@@ -167,7 +167,7 @@ export const AlertHistoryList: React.FC = () => {
                           {event.type === 'volume-above' && (
                             <div className="flex items-center text-xs text-trader-blue">
                               <ChartBar className="h-3 w-3 mr-1" />
-                              <span>Volume > {event.threshold}</span>
+                              <span>Volume {'>'}  {event.threshold}</span>
                             </div>
                           )}
                         </div>
