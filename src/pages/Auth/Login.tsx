@@ -1,384 +1,356 @@
 
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
+import { Github, LineChart, Mail } from "lucide-react";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+// Adicione esquemas de validação Zod para login e registro
+const loginSchema = z.object({
+  email: z.string().email({ message: "Email inválido" }),
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" })
+});
 
-interface RegisterFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+const registerSchema = z.object({
+  name: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }),
+  email: z.string().email({ message: "Email inválido" }),
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"]
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "login";
+  const isAdminLogin = searchParams.get("role") === "admin";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const { toast } = useToast();
-  const { login, register } = useAuth();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const tabParam = searchParams.get('tab');
-  
-  const [loginForm, setLoginForm] = useState<LoginFormData>({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState<RegisterFormData>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const navigate = useNavigate();
+  const { login, register: registerUser, isAuthenticated, isAdmin } = useAuth();
+
+  // Configurar formulário de login com react-hook-form + zod
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [showLoginPassword, setShowLoginPassword] = useState(false);
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>(tabParam === 'register' ? 'register' : 'login');
 
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLoginForm((prev) => ({ ...prev, [name]: value }));
-  };
+  // Configurar formulário de registro com react-hook-form + zod
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    }
+  });
 
-  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setRegisterForm((prev) => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (isAdmin && isAdminLogin) {
+        navigate('/admin/users');
+        toast({
+          title: "Login administrador bem-sucedido",
+          description: "Bem-vindo ao painel administrativo.",
+        });
+      } else if (isAdminLogin && !isAdmin) {
+        toast({
+          variant: "destructive",
+          title: "Acesso negado",
+          description: "Você não tem permissões de administrador.",
+        });
+        // Resetamos o login se um usuário comum tenta acessar área de admin
+      } else {
+        navigate('/dashboard');
+        toast({
+          title: "Login bem-sucedido",
+          description: "Bem-vindo de volta!",
+        });
+      }
+    }
+  }, [isAuthenticated, isAdmin, navigate, toast, isAdminLogin]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const onLoginSubmit = async (data: LoginFormValues) => {
     try {
-      // Fazer login real com a API
-      await login(loginForm.email, loginForm.password);
-      
-      toast({
-        title: "Login bem-sucedido!",
-        description: "Bem-vindo de volta à plataforma TradeMaster.",
-      });
-      
-      // Redirecionamento imediato para o dashboard
-      navigate("/dashboard");
+      await login(data.email, data.password);
+      // A navegação é gerenciada pelo useEffect acima
     } catch (error) {
-      console.error("Erro no login: ", error);
-      toast({
-        title: "Erro ao fazer login",
-        description: "Verifique suas credenciais e tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      console.error("Erro ao fazer login:", error);
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    if (registerForm.password !== registerForm.confirmPassword) {
-      toast({
-        title: "As senhas não coincidem",
-        description: "Por favor, verifique se as senhas digitadas são iguais.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
     try {
-      // Realizar registro real com a API
-      await register(registerForm.name, registerForm.email, registerForm.password);
-      
+      await registerUser(data.name, data.email, data.password);
       toast({
-        title: "Conta criada com sucesso!",
-        description: "Bem-vindo(a) à plataforma TradeMaster.",
+        title: "Conta criada com sucesso",
+        description: "Agora você pode fazer login.",
       });
-      
-      // Redirecionamento imediato para o dashboard
-      navigate("/dashboard");
+      setActiveTab("login");
     } catch (error) {
-      console.error("Erro no registro: ", error);
-      toast({
-        title: "Erro ao criar conta",
-        description: "Tente novamente mais tarde ou entre em contato com o suporte.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      console.error("Erro ao registrar:", error);
     }
-  };
-
-  const handleSocialAuth = (provider: string) => {
-    toast({
-      title: `Autenticação com ${provider}`,
-      description: "Esta funcionalidade está em desenvolvimento e estará disponível em breve.",
-    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Button 
-        variant="ghost" 
-        className="absolute top-4 left-4 flex items-center gap-2 hover:bg-white/50"
-        onClick={() => navigate('/')}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span>Voltar para home</span>
-      </Button>
-      
-      <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="flex justify-center mb-4">
-            <LineChart className="h-12 w-12 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">TradeMaster</h1>
-          <p className="text-gray-600">Plataforma de análise de investimentos</p>
+          <Link to="/" className="inline-flex items-center justify-center">
+            <LineChart className="h-6 w-6 text-primary mr-2" />
+            <span className="text-2xl font-bold">TradeMaster</span>
+          </Link>
         </div>
 
         <Card className="border-none shadow-lg">
-          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-            <CardHeader className="pb-2">
-              <TabsList className="grid grid-cols-2 w-full">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Cadastro</TabsTrigger>
-              </TabsList>
-            </CardHeader>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">
+              {isAdminLogin ? "Acesso administrativo" : "Bem-vindo"}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {isAdminLogin
+                ? "Faça login com sua conta de administrador"
+                : "Faça login na sua conta ou crie uma nova"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            {!isAdminLogin ? (
+              <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-8">
+                  <TabsTrigger value="login">Entrar</TabsTrigger>
+                  <TabsTrigger value="register">Cadastrar</TabsTrigger>
+                </TabsList>
 
-            <CardContent className="pt-4">
-              <TabsContent value="login" className="space-y-4">
-                <form onSubmit={handleLogin}>
-                  <div className="space-y-4">
+                <TabsContent value="login">
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
                         placeholder="seu@email.com"
-                        value={loginForm.email}
-                        onChange={handleLoginChange}
-                        required
+                        {...loginForm.register("email")}
                       />
+                      {loginForm.formState.errors.email && (
+                        <p className="text-sm text-red-500">{loginForm.formState.errors.email.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between">
+                      <div className="flex items-center justify-between">
                         <Label htmlFor="password">Senha</Label>
-                        <button
-                          type="button"
-                          className="text-xs text-primary hover:underline"
-                          onClick={() => toast({
-                            title: "Recuperação de senha",
-                            description: "Funcionalidade em desenvolvimento. Estará disponível em breve."
-                          })}
-                        >
+                        <Link to="/auth/forgot-password" className="text-xs text-primary hover:underline">
                           Esqueceu a senha?
-                        </button>
+                        </Link>
                       </div>
-                      <div className="relative">
-                        <Input
-                          id="password"
-                          name="password"
-                          type={showLoginPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={loginForm.password}
-                          onChange={handleLoginChange}
-                          required
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
-                          onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        >
-                          {showLoginPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        {...loginForm.register("password")}
+                      />
+                      {loginForm.formState.errors.password && (
+                        <p className="text-sm text-red-500">{loginForm.formState.errors.password.message}</p>
+                      )}
                     </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Entrando..." : "Entrar"}
+                    <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
+                      {loginForm.formState.isSubmitting ? "Entrando..." : "Entrar"}
+                    </Button>
+                  </form>
+
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Ou continue com
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" className="w-full" onClick={() => {
+                      toast({
+                        description: "Login com Google não está disponível neste momento."
+                      });
+                    }}>
+                      <Mail className="mr-2 h-4 w-4" /> Google
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => {
+                      toast({
+                        description: "Login com GitHub não está disponível neste momento."
+                      });
+                    }}>
+                      <Github className="mr-2 h-4 w-4" /> GitHub
                     </Button>
                   </div>
-                </form>
+                </TabsContent>
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">
-                    Não tem uma conta?{" "}
-                    <button
-                      type="button"
-                      className="text-primary hover:underline"
-                      onClick={() => setActiveTab("register")}
-                    >
-                      Cadastre-se
-                    </button>
-                  </p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="register" className="space-y-4">
-                <form onSubmit={handleRegister}>
-                  <div className="space-y-4">
+                <TabsContent value="register">
+                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="register-name">Nome completo</Label>
+                      <Label htmlFor="name">Nome</Label>
                       <Input
-                        id="register-name"
-                        name="name"
+                        id="name"
                         placeholder="Seu nome completo"
-                        value={registerForm.name}
-                        onChange={handleRegisterChange}
-                        required
+                        {...registerForm.register("name")}
                       />
+                      {registerForm.formState.errors.name && (
+                        <p className="text-sm text-red-500">{registerForm.formState.errors.name.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="register-email">Email</Label>
                       <Input
                         id="register-email"
-                        name="email"
                         type="email"
                         placeholder="seu@email.com"
-                        value={registerForm.email}
-                        onChange={handleRegisterChange}
-                        required
+                        {...registerForm.register("email")}
                       />
+                      {registerForm.formState.errors.email && (
+                        <p className="text-sm text-red-500">{registerForm.formState.errors.email.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="register-password">Senha</Label>
-                      <div className="relative">
-                        <Input
-                          id="register-password"
-                          name="password"
-                          type={showRegisterPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={registerForm.password}
-                          onChange={handleRegisterChange}
-                          required
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
-                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                        >
-                          {showRegisterPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
+                      <Input
+                        id="register-password"
+                        type="password"
+                        placeholder="••••••••"
+                        {...registerForm.register("password")}
+                      />
+                      {registerForm.formState.errors.password && (
+                        <p className="text-sm text-red-500">{registerForm.formState.errors.password.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirm-password">Confirmar senha</Label>
-                      <div className="relative">
-                        <Input
-                          id="confirm-password"
-                          name="confirmPassword"
-                          type={showRegisterConfirmPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={registerForm.confirmPassword}
-                          onChange={handleRegisterChange}
-                          required
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
-                          onClick={() =>
-                            setShowRegisterConfirmPassword(!showRegisterConfirmPassword)
-                          }
-                        >
-                          {showRegisterConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="••••••••"
+                        {...registerForm.register("confirmPassword")}
+                      />
+                      {registerForm.formState.errors.confirmPassword && (
+                        <p className="text-sm text-red-500">{registerForm.formState.errors.confirmPassword.message}</p>
+                      )}
                     </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Criando conta..." : "Criar conta"}
+                    <Button type="submit" className="w-full" disabled={registerForm.formState.isSubmitting}>
+                      {registerForm.formState.isSubmitting ? "Criando conta..." : "Criar conta"}
+                    </Button>
+                  </form>
+
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Ou continue com
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" className="w-full" onClick={() => {
+                      toast({
+                        description: "Registro com Google não está disponível neste momento."
+                      });
+                    }}>
+                      <Mail className="mr-2 h-4 w-4" /> Google
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => {
+                      toast({
+                        description: "Registro com GitHub não está disponível neste momento."
+                      });
+                    }}>
+                      <Github className="mr-2 h-4 w-4" /> GitHub
                     </Button>
                   </div>
-                </form>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">
-                    Já tem uma conta?{" "}
-                    <button
-                      type="button"
-                      className="text-primary hover:underline"
-                      onClick={() => setActiveTab("login")}
-                    >
-                      Faça login
-                    </button>
-                  </p>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email de administrador</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@email.com"
+                    {...loginForm.register("email")}
+                  />
+                  {loginForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">{loginForm.formState.errors.email.message}</p>
+                  )}
                 </div>
-              </TabsContent>
-
-              <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Senha</Label>
+                    <Link to="/auth/forgot-password" className="text-xs text-primary hover:underline">
+                      Esqueceu a senha?
+                    </Link>
                   </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-white px-2 text-gray-500">
-                      Ou continue com
-                    </span>
-                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    {...loginForm.register("password")}
+                  />
+                  {loginForm.formState.errors.password && (
+                    <p className="text-sm text-red-500">{loginForm.formState.errors.password.message}</p>
+                  )}
                 </div>
-
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => handleSocialAuth('Google')}
-                    type="button"
-                  >
-                    Google
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => handleSocialAuth('GitHub')}
-                    type="button"
-                  >
-                    GitHub
+                <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
+                  {loginForm.formState.isSubmitting ? "Entrando..." : "Entrar como Administrador"}
+                </Button>
+              </form>
+            )}
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm text-muted-foreground">
+              {isAdminLogin ? (
+                <div className="flex justify-center">
+                  <Button variant="link" className="px-2 py-0" onClick={() => navigate('/auth/login')}>
+                    Voltar para login de usuário normal
                   </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Tabs>
+              ) : (
+                <div className="text-center text-sm text-muted-foreground">
+                  Ao continuar, você concorda com nossos{" "}
+                  <Link to="/terms" className="underline underline-offset-4 hover:text-primary">
+                    Termos de Serviço
+                  </Link>{" "}
+                  e{" "}
+                  <Link to="/privacy" className="underline underline-offset-4 hover:text-primary">
+                    Política de Privacidade
+                  </Link>
+                  .
+                </div>
+              )}
+            </div>
+            <div className="text-center">
+              <Link to="/" className="text-sm text-primary hover:underline">
+                Voltar para a página inicial
+              </Link>
+            </div>
+          </CardFooter>
         </Card>
-
-        <p className="mt-4 text-center text-xs text-gray-500">
-          Ao continuar, você concorda com nossos{" "}
-          <a href="/terms" className="text-primary hover:underline">
-            Termos de Uso
-          </a>{" "}
-          e{" "}
-          <a href="/privacy" className="text-primary hover:underline">
-            Política de Privacidade
-          </a>
-          .
-        </p>
       </div>
     </div>
   );

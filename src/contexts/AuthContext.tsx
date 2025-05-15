@@ -77,12 +77,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Simulação de login para desenvolvimento
       if (process.env.NODE_ENV === 'development') {
+        // Verifica se é um email de administrador (simulação)
+        const isAdmin = email.toLowerCase().includes('admin') || email.toLowerCase() === 'admin@trademaster.com';
+        
         const mockUser = {
           id: 1,
-          name: email.split('@')[0],
+          name: isAdmin ? 'Administrador' : email.split('@')[0],
           email,
-          role: email.includes('admin') ? 'admin' : 'user',
-          plan: 'free'
+          role: isAdmin ? 'admin' : 'user',
+          plan: isAdmin ? 'admin' : 'free'
         };
         
         const mockResponse = {
@@ -102,8 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(mockResponse.user);
         
         toast({
-          title: "Login realizado com sucesso",
-          description: "Bem-vindo à plataforma!",
+          title: `Login ${isAdmin ? 'administrativo' : ''} realizado com sucesso`,
+          description: `Bem-vindo${isAdmin ? ', Administrador' : ''} à plataforma!`,
         });
         
         return mockResponse;
@@ -125,8 +128,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       
       toast({
-        title: "Login realizado com sucesso",
-        description: "Bem-vindo à plataforma!",
+        title: `Login ${user.role === 'admin' ? 'administrativo' : ''} realizado com sucesso`,
+        description: `Bem-vindo${user.role === 'admin' ? ', Administrador' : ''} à plataforma!`,
       });
       
       return response.data;

@@ -12,11 +12,11 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { LineChart, Menu, X } from "lucide-react";
+import { LineChart, Menu, X, Shield } from "lucide-react";
 
-const MainNav: React.FC<{ onLoginClick: () => void; onRegisterClick: () => void }> = ({
+const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> = ({
   onLoginClick,
-  onRegisterClick,
+  onAdminClick,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -157,7 +157,9 @@ const MainNav: React.FC<{ onLoginClick: () => void; onRegisterClick: () => void 
             <Button variant="outline" onClick={onLoginClick}>
               Entrar
             </Button>
-            <Button onClick={onRegisterClick}>Começar Grátis</Button>
+            <Button onClick={onAdminClick} className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" /> Admin
+            </Button>
           </div>
         </div>
 
@@ -222,8 +224,8 @@ const MainNav: React.FC<{ onLoginClick: () => void; onRegisterClick: () => void 
               <Button variant="outline" onClick={onLoginClick} className="w-full mb-2">
                 Entrar
               </Button>
-              <Button onClick={onRegisterClick} className="w-full">
-                Começar Grátis
+              <Button onClick={onAdminClick} className="w-full flex items-center justify-center">
+                <Shield className="mr-2 h-4 w-4" /> Admin
               </Button>
             </div>
           </div>

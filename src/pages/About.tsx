@@ -25,9 +25,10 @@ const About: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <MainNav 
         onLoginClick={() => navigate('/auth/login')} 
-        onRegisterClick={() => navigate('/auth/login?tab=register')}
+        onAdminClick={() => navigate('/auth/login?role=admin')}
       />
       
+      {/* Header */}
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}

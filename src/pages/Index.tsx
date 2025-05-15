@@ -13,14 +13,14 @@ const Index: React.FC = () => {
     navigate('/auth/login');
   };
 
-  const handleRegisterClick = () => {
-    navigate('/auth/login?tab=register');
+  const handleAdminClick = () => {
+    navigate('/auth/login?role=admin');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Main Navigation */}
-      <MainNav onLoginClick={handleLoginClick} onRegisterClick={handleRegisterClick} />
+      <MainNav onLoginClick={handleLoginClick} onAdminClick={handleAdminClick} />
       
       {/* Content with padding for fixed header */}
       <div className="pt-20">
