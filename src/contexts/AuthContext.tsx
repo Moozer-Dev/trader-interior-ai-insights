@@ -60,10 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
           console.error('Erro ao verificar autenticação:', error);
           logout();
+        } finally {
+          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
     
     checkAuth();
@@ -71,6 +73,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Tentativa de login para:', email);
+      
+      // Simulação de login para desenvolvimento
+      if (process.env.NODE_ENV === 'development') {
+        const mockUser = {
+          id: 1,
+          name: email.split('@')[0],
+          email,
+          role: email.includes('admin') ? 'admin' : 'user',
+          plan: 'free'
+        };
+        
+        const mockResponse = {
+          user: mockUser,
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token'
+        };
+        
+        // Armazenar tokens e dados do usuário
+        localStorage.setItem('accessToken', mockResponse.accessToken);
+        localStorage.setItem('refreshToken', mockResponse.refreshToken);
+        localStorage.setItem('user', JSON.stringify(mockResponse.user));
+        
+        // Configurar token para futuras requisições
+        axios.defaults.headers.common['Authorization'] = `Bearer ${mockResponse.accessToken}`;
+        
+        setUser(mockResponse.user);
+        
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Bem-vindo à plataforma!",
+        });
+        
+        return mockResponse;
+      }
+      
+      // Login real
       const response = await axios.post('/api/auth/login', { email, password });
       
       const { accessToken, refreshToken, user } = response.data;
@@ -104,7 +143,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string) => {
     try {
+      console.log('Tentativa de registro para:', email);
+      
+      // Simulação de registro para desenvolvimento
+      if (process.env.NODE_ENV === 'development') {
+        const mockUser = {
+          id: Math.floor(Math.random() * 1000) + 1,
+          name,
+          email,
+          role: 'user',
+          plan: 'free'
+        };
+        
+        const mockResponse = {
+          user: mockUser,
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token'
+        };
+        
+        // Armazenar tokens e dados do usuário
+        localStorage.setItem('accessToken', mockResponse.accessToken);
+        localStorage.setItem('refreshToken', mockResponse.refreshToken);
+        localStorage.setItem('user', JSON.stringify(mockResponse.user));
+        
+        // Configurar token para futuras requisições
+        axios.defaults.headers.common['Authorization'] = `Bearer ${mockResponse.accessToken}`;
+        
+        setUser(mockResponse.user);
+        
+        toast({
+          title: "Cadastro realizado com sucesso",
+          description: "Sua conta foi criada com sucesso!",
+        });
+        
+        return mockResponse;
+      }
+      
+      // Registro real
       const response = await axios.post('/api/auth/register', { name, email, password });
+      
+      const { accessToken, refreshToken, user } = response.data;
+      
+      // Armazenar tokens e dados do usuário
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Configurar token para futuras requisições
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      
+      setUser(user);
       
       toast({
         title: "Cadastro realizado com sucesso",

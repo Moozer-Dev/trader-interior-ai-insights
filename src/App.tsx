@@ -23,13 +23,10 @@ import AdminRoute from "@/components/auth/AdminRoute";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
-
-// New page imports for the links in footer
-// Using the new pages we've created
-const Careers = () => <div className="p-8 text-center">Página de Carreiras em construção</div>;
-const Terms = () => <div className="p-8 text-center">Termos de Uso em construção</div>;
-const Privacy = () => <div className="p-8 text-center">Política de Privacidade em construção</div>;
-const Cookies = () => <div className="p-8 text-center">Política de Cookies em construção</div>;
+import Careers from "./pages/Careers";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
 

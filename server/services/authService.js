@@ -7,10 +7,14 @@ const config = require('../config');
 // Registrar usuário
 async function registerUser(name, email, password) {
   try {
+    // Log para depuração
+    console.log('Iniciando registro de usuário:', { name, email });
+    
     // Verificar se o email já existe
     const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (rows.length > 0) {
+      console.log('Email já cadastrado:', email);
       throw { code: '23505', message: 'Email já cadastrado' };
     }
     
@@ -22,6 +26,8 @@ async function registerUser(name, email, password) {
       'INSERT INTO users (name, email, password, role, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, name, email, role',
       [name, email, hashedPassword, 'user']
     );
+    
+    console.log('Usuário registrado com sucesso:', { id: newUser[0].id, email });
     
     // Gerar tokens
     const { accessToken, refreshToken } = generateTokens(newUser[0]);
@@ -43,7 +49,7 @@ async function registerUser(name, email, password) {
       refreshToken
     };
   } catch (error) {
-    console.error('Erro no registro:', error);
+    console.error('Erro detalhado no registro:', error);
     throw error;
   }
 }
@@ -51,10 +57,14 @@ async function registerUser(name, email, password) {
 // Login de usuário
 async function loginUser(email, password) {
   try {
+    // Log para depuração
+    console.log('Tentativa de login:', { email });
+    
     // Buscar usuário pelo email
     const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (rows.length === 0) {
+      console.log('Usuário não encontrado:', email);
       return null;
     }
     
@@ -64,8 +74,11 @@ async function loginUser(email, password) {
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
+      console.log('Senha incorreta para usuário:', email);
       return null;
     }
+    
+    console.log('Login bem-sucedido:', { id: user.id, email });
     
     // Gerar tokens
     const { accessToken, refreshToken } = generateTokens(user);
@@ -87,7 +100,7 @@ async function loginUser(email, password) {
       refreshToken
     };
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('Erro detalhado no login:', error);
     throw error;
   }
 }

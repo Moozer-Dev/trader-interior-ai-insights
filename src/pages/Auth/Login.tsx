@@ -59,29 +59,25 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Como esta é uma demo, simularemos um login bem-sucedido
-      // sem fazer uma chamada real à API
-      console.log("Simulando login para:", loginForm.email);
+      // Fazer login real com a API
+      await login(loginForm.email, loginForm.password);
       
-      // await login(loginForm.email, loginForm.password);
+      toast({
+        title: "Login bem-sucedido!",
+        description: "Bem-vindo de volta à plataforma TradeMaster.",
+      });
       
-      // Simulando sucesso após 1 segundo
-      setTimeout(() => {
-        toast({
-          title: "Login bem-sucedido!",
-          description: "Bem-vindo de volta à plataforma TradeMaster.",
-        });
-        navigate("/dashboard");
-        setIsLoading(false);
-      }, 1000);
+      // Redirecionamento imediato para o dashboard
+      navigate("/dashboard");
     } catch (error) {
       console.error("Erro no login: ", error);
-      setIsLoading(false);
       toast({
         title: "Erro ao fazer login",
         description: "Verifique suas credenciais e tente novamente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,29 +96,25 @@ const Login: React.FC = () => {
     }
 
     try {
-      // Como esta é uma demo, simularemos um registro bem-sucedido
-      // sem fazer uma chamada real à API
-      console.log("Simulando registro para:", registerForm.email);
+      // Realizar registro real com a API
+      await register(registerForm.name, registerForm.email, registerForm.password);
       
-      // await register(registerForm.name, registerForm.email, registerForm.password);
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo(a) à plataforma TradeMaster.",
+      });
       
-      // Simulando sucesso após 1 segundo
-      setTimeout(() => {
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Bem-vindo(a) à plataforma TradeMaster.",
-        });
-        navigate("/dashboard");
-        setIsLoading(false);
-      }, 1000);
+      // Redirecionamento imediato para o dashboard
+      navigate("/dashboard");
     } catch (error) {
       console.error("Erro no registro: ", error);
-      setIsLoading(false);
       toast({
         title: "Erro ao criar conta",
         description: "Tente novamente mais tarde ou entre em contato com o suporte.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
