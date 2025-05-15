@@ -12,12 +12,34 @@ export function usePortfolioData() {
   return useQuery({
     queryKey: ['portfolioData', hasRealTimeData],
     queryFn: async () => {
-      const response = await axios.get('/api/portfolio/summary', {
-        params: { 
-          realtime: hasRealTimeData 
-        }
-      });
-      return response.data;
+      try {
+        const response = await axios.get('/api/portfolio/summary', {
+          params: { 
+            realtime: hasRealTimeData 
+          }
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Erro ao buscar dados do portfólio:', error);
+        // Retornar objeto com valores padrão em caso de erro
+        return {
+          totalValue: 0,
+          monthlyChange: 0,
+          totalReturn: 0,
+          totalReturnPercentage: 0,
+          assets: [],
+          historicalData: []
+        };
+      }
+    },
+    // Fornecer valores padrão para evitar erros
+    initialData: {
+      totalValue: 0,
+      monthlyChange: 0,
+      totalReturn: 0,
+      totalReturnPercentage: 0,
+      assets: [],
+      historicalData: []
     },
     refetchInterval: hasRealTimeData ? 15000 : 60000, // Atualizar com maior frequência para usuários premium
     staleTime: hasRealTimeData ? 10000 : 60000

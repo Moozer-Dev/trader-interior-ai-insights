@@ -17,6 +17,15 @@ export const PortfolioSummary = () => {
   const isFreeUser = !user?.plan || user.plan === 'free';
   const hasPlanLimitation = isFreeUser && portfolioData?.assets && portfolioData.assets.length >= 5;
 
+  // Função helper para formatação segura de números
+  const safeFormatNumber = (value) => {
+    // Se o valor não for um número válido, retorna "0,00"
+    if (value === undefined || value === null || isNaN(value)) {
+      return "0,00";
+    }
+    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -66,27 +75,27 @@ export const PortfolioSummary = () => {
               <div className="space-y-6">
                 <div>
                   <div className="text-muted-foreground mb-2">Valor Total</div>
-                  <div className="text-3xl font-bold">R$ {portfolioData.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                  <div className={`flex items-center ${portfolioData.monthlyChange >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
-                    {portfolioData.monthlyChange >= 0 ? (
+                  <div className="text-3xl font-bold">R$ {safeFormatNumber(portfolioData.totalValue)}</div>
+                  <div className={`flex items-center ${(portfolioData.monthlyChange || 0) >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
+                    {(portfolioData.monthlyChange || 0) >= 0 ? (
                       <ArrowUp className="h-4 w-4 mr-1" />
                     ) : (
                       <ArrowDown className="h-4 w-4 mr-1" />
                     )}
-                    <span className="text-sm">{Math.abs(portfolioData.monthlyChange).toFixed(1)}% (este mês)</span>
+                    <span className="text-sm">{Math.abs(portfolioData.monthlyChange || 0).toFixed(1)}% (este mês)</span>
                   </div>
                 </div>
                 
                 <div>
                   <div className="text-muted-foreground mb-2">Retorno Total</div>
-                  <div className="text-2xl font-bold">R$ {portfolioData.totalReturn.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                  <div className={`flex items-center ${portfolioData.totalReturnPercentage >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
-                    {portfolioData.totalReturnPercentage >= 0 ? (
+                  <div className="text-2xl font-bold">R$ {safeFormatNumber(portfolioData.totalReturn)}</div>
+                  <div className={`flex items-center ${(portfolioData.totalReturnPercentage || 0) >= 0 ? 'text-trader-green' : 'text-trader-red'} mt-1`}>
+                    {(portfolioData.totalReturnPercentage || 0) >= 0 ? (
                       <ArrowUp className="h-4 w-4 mr-1" />
                     ) : (
                       <ArrowDown className="h-4 w-4 mr-1" />
                     )}
-                    <span className="text-sm">{Math.abs(portfolioData.totalReturnPercentage).toFixed(1)}% (desde o início)</span>
+                    <span className="text-sm">{Math.abs(portfolioData.totalReturnPercentage || 0).toFixed(1)}% (desde o início)</span>
                   </div>
                 </div>
               </div>
@@ -179,22 +188,22 @@ export const PortfolioSummary = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {portfolioData.assets.map((asset: any, index: number) => (
+                    {portfolioData.assets.map((asset, index) => (
                       <tr key={index} className="border-b border-border">
                         <td className="py-3 font-medium">{asset.symbol}</td>
-                        <td>R$ {asset.price.toFixed(2)}</td>
+                        <td>R$ {asset.price ? asset.price.toFixed(2) : "0.00"}</td>
                         <td>
-                          <div className={`flex items-center ${asset.change >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
-                            {asset.change >= 0 ? (
+                          <div className={`flex items-center ${(asset.change || 0) >= 0 ? 'text-trader-green' : 'text-trader-red'}`}>
+                            {(asset.change || 0) >= 0 ? (
                               <ArrowUp className="h-3 w-3 mr-1" />
                             ) : (
                               <ArrowDown className="h-3 w-3 mr-1" />
                             )}
-                            {Math.abs(asset.change)}%
+                            {Math.abs(asset.change || 0)}%
                           </div>
                         </td>
                         <td>{asset.quantity}</td>
-                        <td className="text-right">R$ {asset.total.toFixed(2)}</td>
+                        <td className="text-right">R$ {asset.total ? asset.total.toFixed(2) : "0.00"}</td>
                       </tr>
                     ))}
                   </tbody>
