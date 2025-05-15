@@ -26,10 +26,24 @@ export const RecentAlerts: React.FC = () => {
   const { data: alertsData, isLoading, isError, refetch } = useQuery({
     queryKey: ['recentAlerts'],
     queryFn: async () => {
-      const response = await axios.get('/api/alerts/recent');
-      return response.data;
-    }
+      try {
+        const response = await axios.get('/api/alerts/recent');
+        return response.data;
+      } catch (error) {
+        console.error('Erro ao buscar alertas recentes:', error);
+        // Retornar array vazio em caso de erro para não quebrar o map
+        return [];
+      }
+    },
+    // Fornecer um valor padrão para evitar erros com map
+    initialData: []
   });
+
+  // Para evitar erros, garantir que alertsData é um array antes de chamar map
+  const alerts = Array.isArray(alertsData) ? alertsData : [];
+  
+  // Adicionando log para debug
+  console.log('Dados de alertas recebidos:', alertsData);
 
   return (
     <Card>
@@ -59,7 +73,7 @@ export const RecentAlerts: React.FC = () => {
               Tentar novamente
             </Button>
           </div>
-        ) : !alertsData || alertsData.length === 0 ? (
+        ) : alerts.length === 0 ? (
           <div className="py-10 text-center">
             <p className="text-muted-foreground mb-4">Nenhum alerta configurado</p>
             <Button asChild>
@@ -68,7 +82,7 @@ export const RecentAlerts: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {alertsData.map((alert: AlertItem) => (
+            {alerts.map((alert: AlertItem) => (
               <div key={alert.id} className={cn(
                 "p-3 rounded-lg border",
                 alert.status === 'triggered' ? "bg-muted/50" : "bg-background"
