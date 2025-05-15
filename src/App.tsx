@@ -21,14 +21,15 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
 
 // New page imports for the links in footer
-const Contact = () => <About />; // Temporary placeholder
-const Blog = () => <About />; // Temporary placeholder 
-const Careers = () => <About />; // Temporary placeholder
-const Terms = () => <About />; // Temporary placeholder
-const Privacy = () => <About />; // Temporary placeholder
-const Cookies = () => <About />; // Temporary placeholder
+// Using the new pages we've created
+const Careers = () => <div className="p-8 text-center">Página de Carreiras em construção</div>;
+const Terms = () => <div className="p-8 text-center">Termos de Uso em construção</div>;
+const Privacy = () => <div className="p-8 text-center">Política de Privacidade em construção</div>;
+const Cookies = () => <div className="p-8 text-center">Política de Cookies em construção</div>;
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,8 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:id" element={<Blog />} />
+              <Route path="/blog/category/:category" element={<Blog />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />

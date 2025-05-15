@@ -1,279 +1,360 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LineChart, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, User, ArrowRight, Home } from 'lucide-react';
-import axios from 'axios';
+import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+interface RegisterFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const Login: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const tabParam = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState<string>(tabParam === 'register' ? 'register' : 'login');
-  const [loading, setLoading] = useState<boolean>(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { login, register } = useAuth();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const tabParam = searchParams.get('tab');
+  
+  const [loginForm, setLoginForm] = useState<LoginFormData>({ email: "", password: "" });
+  const [registerForm, setRegisterForm] = useState<RegisterFormData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>(tabParam === 'register' ? 'register' : 'login');
 
-  // Set initial tab based on URL parameter
-  useEffect(() => {
-    if (tabParam === 'register') {
-      setActiveTab('register');
-    }
-  }, [tabParam]);
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState<string>("");
-  const [loginPassword, setLoginPassword] = useState<string>("");
-
-  // Register form state
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const response = await axios.post('/api/auth/login', {
-        email: loginEmail,
-        password: loginPassword
-      });
-      
-      // Armazenar tokens no localStorage
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    setIsLoading(true);
 
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Redirecionando para o dashboard...",
-      });
-      
-      // Redirecionar para o dashboard após login
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+    try {
+      await login(loginForm.email, loginForm.password);
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error("Erro no login: ", error);
       toast({
+        title: "Erro ao fazer login",
+        description: "Verifique suas credenciais e tente novamente.",
         variant: "destructive",
-        title: "Erro no login",
-        description: "Credenciais inválidas ou erro no servidor.",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
+    setIsLoading(true);
+
+    if (registerForm.password !== registerForm.confirmPassword) {
       toast({
+        title: "As senhas não coincidem",
+        description: "Por favor, verifique se as senhas digitadas são iguais.",
         variant: "destructive",
-        title: "Senhas não coincidem",
-        description: "Por favor, verifique se as senhas são iguais."
       });
+      setIsLoading(false);
       return;
     }
-    
-    setLoading(true);
-    
+
     try {
-      const response = await axios.post('/api/auth/register', {
-        name,
-        email,
-        password
-      });
-      
+      await register(registerForm.name, registerForm.email, registerForm.password);
       toast({
-        title: "Conta criada com sucesso",
-        description: "Faça login para acessar o sistema.",
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo(a) à plataforma TradeMaster.",
       });
-      
-      // Limpar formulário e mudar para aba de login
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setActiveTab("login");
-    } catch (error: any) {
-      console.error('Erro no registro:', error);
-      const errorMessage = error.response?.data?.message || "Erro ao criar conta";
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Erro no registro: ", error);
       toast({
+        title: "Erro ao criar conta",
+        description: "Tente novamente mais tarde ou entre em contato com o suporte.",
         variant: "destructive",
-        title: "Erro no cadastro",
-        description: "API de registro não disponível. Use as credenciais de teste ou configure o backend.",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="absolute top-4 left-4">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="rounded-full shadow-md"
-          onClick={() => navigate('/')}
-        >
-          <Home className="h-5 w-5" />
-        </Button>
-      </div>
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Button 
+        variant="ghost" 
+        className="absolute top-4 left-4 flex items-center gap-2 hover:bg-white/50"
+        onClick={() => navigate('/')}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span>Voltar para home</span>
+      </Button>
+      
+      <div className="w-full max-w-md animate-fade-in">
+        <div className="mb-8 text-center">
+          <div className="flex justify-center mb-4">
+            <LineChart className="h-12 w-12 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold">TradeMaster</h1>
+          <p className="text-gray-600">Plataforma de análise de investimentos</p>
+        </div>
+
         <Card className="border-none shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Bem-vindo à TradeMaster</CardTitle>
-            <CardDescription>Faça login ou crie uma conta para continuar</CardDescription>
-          </CardHeader>
-          
-          <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Cadastro</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleLogin}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="seu@email.com" 
-                        className="pl-10" 
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+            <CardHeader className="pb-2">
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="register">Cadastro</TabsTrigger>
+              </TabsList>
+            </CardHeader>
+
+            <CardContent className="pt-4">
+              <TabsContent value="login" className="space-y-4">
+                <form onSubmit={handleLogin}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={loginForm.email}
+                        onChange={handleLoginChange}
                         required
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Senha</Label>
-                      <Button variant="link" className="h-auto p-0 text-xs" type="button">
-                        Esqueceu a senha?
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label htmlFor="password">Senha</Label>
+                        <button
+                          type="button"
+                          className="text-xs text-primary hover:underline"
+                          onClick={() => alert("Funcionalidade em desenvolvimento")}
+                        >
+                          Esqueceu a senha?
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showLoginPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={loginForm.password}
+                          onChange={handleLoginChange}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                          onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        >
+                          {showLoginPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="password" 
-                        type="password" 
-                        placeholder="••••••••" 
-                        className="pl-10" 
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Entrando..." : "Entrar"}
+                    </Button>
+                  </div>
+                </form>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">
+                    Não tem uma conta?{" "}
+                    <button
+                      type="button"
+                      className="text-primary hover:underline"
+                      onClick={() => setActiveTab("register")}
+                    >
+                      Cadastre-se
+                    </button>
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="register" className="space-y-4">
+                <form onSubmit={handleRegister}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="register-name">Nome completo</Label>
+                      <Input
+                        id="register-name"
+                        name="name"
+                        placeholder="Seu nome completo"
+                        value={registerForm.name}
+                        onChange={handleRegisterChange}
                         required
                       />
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-email">Email</Label>
+                      <Input
+                        id="register-email"
+                        name="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={registerForm.email}
+                        onChange={handleRegisterChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-password">Senha</Label>
+                      <div className="relative">
+                        <Input
+                          id="register-password"
+                          name="password"
+                          type={showRegisterPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={registerForm.password}
+                          onChange={handleRegisterChange}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                        >
+                          {showRegisterPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password">Confirmar senha</Label>
+                      <div className="relative">
+                        <Input
+                          id="confirm-password"
+                          name="confirmPassword"
+                          type={showRegisterConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={registerForm.confirmPassword}
+                          onChange={handleRegisterChange}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                          onClick={() =>
+                            setShowRegisterConfirmPassword(!showRegisterConfirmPassword)
+                          }
+                        >
+                          {showRegisterConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Criando conta..." : "Criar conta"}
+                    </Button>
                   </div>
-                </CardContent>
-                
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={loading}
+                </form>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">
+                    Já tem uma conta?{" "}
+                    <button
+                      type="button"
+                      className="text-primary hover:underline"
+                      onClick={() => setActiveTab("login")}
+                    >
+                      Faça login
+                    </button>
+                  </p>
+                </div>
+              </TabsContent>
+
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white px-2 text-gray-500">
+                      Ou continue com
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => alert("Funcionalidade em desenvolvimento")}
                   >
-                    {loading ? "Processando..." : "Entrar na Plataforma"}
+                    Google
                   </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="register">
-              <form onSubmit={handleRegister}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome completo</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="name" 
-                        placeholder="Seu nome completo" 
-                        className="pl-10" 
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="register-email" 
-                        type="email" 
-                        placeholder="seu@email.com" 
-                        className="pl-10" 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="register-password">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="register-password" 
-                        type="password" 
-                        placeholder="••••••••" 
-                        className="pl-10" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirmar senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="confirm-password" 
-                        type="password" 
-                        placeholder="••••••••" 
-                        className="pl-10" 
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-                
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={loading}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => alert("Funcionalidade em desenvolvimento")}
                   >
-                    {loading ? "Processando..." : "Criar Conta"}
+                    GitHub
                   </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
+                </div>
+              </div>
+            </CardContent>
           </Tabs>
         </Card>
+
+        <p className="mt-4 text-center text-xs text-gray-500">
+          Ao continuar, você concorda com nossos{" "}
+          <a href="/terms" className="text-primary hover:underline">
+            Termos de Uso
+          </a>{" "}
+          e{" "}
+          <a href="/privacy" className="text-primary hover:underline">
+            Política de Privacidade
+          </a>
+          .
+        </p>
       </div>
     </div>
   );
