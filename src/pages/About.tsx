@@ -14,7 +14,9 @@ import {
   FileText, 
   Briefcase, 
   Clock, 
-  Globe
+  Globe,
+  Linkedin,
+  Twitter
 } from 'lucide-react';
 import MainNav from '@/components/layout/MainNav';
 

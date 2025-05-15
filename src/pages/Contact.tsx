@@ -15,7 +15,8 @@ import {
   Phone, 
   Mail, 
   Send,
-  CheckCircle
+  CheckCircle,
+  LineChart
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
