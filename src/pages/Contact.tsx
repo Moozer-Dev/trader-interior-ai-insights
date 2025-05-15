@@ -20,6 +20,27 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Função para formatar telefone no padrão brasileiro (XX) XXXXX-XXXX
+const formatPhoneNumber = (value: string): string => {
+  // Remove tudo que não for dígito
+  const numbers = value.replace(/\D/g, '');
+  
+  if (numbers.length === 0) return '';
+  
+  // Formato: (XX)
+  if (numbers.length <= 2) {
+    return `(${numbers}`;
+  }
+  
+  // Formato: (XX) X
+  if (numbers.length <= 7) {
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  }
+  
+  // Formato: (XX) XXXXX-X...
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+};
+
 const Contact: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,7 +56,13 @@ const Contact: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'phone') {
+      // Aplica a formatação para o telefone
+      setForm(prev => ({ ...prev, [name]: formatPhoneNumber(value) }));
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -140,28 +167,36 @@ const Contact: React.FC = () => {
                   <h3 className="font-semibold text-lg mb-3">Siga-nos nas redes sociais</h3>
                   <div className="flex space-x-4">
                     <a 
-                      href="#" 
+                      href="https://facebook.com" 
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="bg-white hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-sm transition-colors"
                       aria-label="Facebook"
                     >
                       <Facebook className="h-5 w-5" />
                     </a>
                     <a 
-                      href="#" 
+                      href="https://instagram.com" 
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="bg-white hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-sm transition-colors"
                       aria-label="Instagram"
                     >
                       <Instagram className="h-5 w-5" />
                     </a>
                     <a 
-                      href="#" 
+                      href="https://twitter.com" 
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="bg-white hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-sm transition-colors"
                       aria-label="Twitter"
                     >
                       <Twitter className="h-5 w-5" />
                     </a>
                     <a 
-                      href="#" 
+                      href="https://linkedin.com" 
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="bg-white hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-sm transition-colors"
                       aria-label="LinkedIn"
                     >
@@ -229,6 +264,7 @@ const Contact: React.FC = () => {
                         value={form.phone}
                         onChange={handleChange}
                         placeholder="(00) 00000-0000"
+                        maxLength={16}
                       />
                     </div>
                     <div className="space-y-2">

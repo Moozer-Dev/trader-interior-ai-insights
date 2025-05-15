@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -76,7 +77,7 @@ const Index: React.FC = () => {
           <div className="container mx-auto text-center">
             <h2 className="text-3xl font-bold mb-12">Dashboard Preview</h2>
             
-            <div className="rounded-lg overflow-hidden shadow-xl mb-8 max-w-5xl mx-auto animate-fade-in">
+            <div className="rounded-lg overflow-hidden shadow-xl mb-8 max-w-4xl mx-auto animate-fade-in">
               <div className="bg-white p-4 border-b flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
@@ -92,11 +93,11 @@ const Index: React.FC = () => {
               </div>
               <div className="bg-white p-0">
                 <img 
-                  src="/dashboard-preview.png" 
+                  src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&auto=format&fit=crop"
                   alt="Dashboard Preview" 
-                  className="w-full h-auto"
+                  className="w-full h-auto max-h-[400px] object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80";
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80";
                   }}
                 />
               </div>
@@ -136,7 +137,7 @@ const Index: React.FC = () => {
               <div className="md:w-1/2">
                 <div className="rounded-lg overflow-hidden shadow-lg animate-fade-in" style={{ animationDelay: "0.5s" }}>
                   <img 
-                    src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80" 
+                    src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80" 
                     alt="Tecnologia de Trading" 
                     className="w-full h-auto"
                   />
@@ -242,7 +243,7 @@ const Index: React.FC = () => {
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-center">
                       <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Cotações com atraso de 15 min</span>
+                      <span>Cotações com atraso de 1 dia</span>
                     </li>
                     <li className="flex items-center">
                       <Star className="h-4 w-4 text-primary mr-2" />
@@ -250,11 +251,11 @@ const Index: React.FC = () => {
                     </li>
                     <li className="flex items-center">
                       <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Portfólio limitado (5 ativos)</span>
+                      <span>Portfólio limitado (2 ativos)</span>
                     </li>
                     <li className="flex items-center">
                       <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Alertas limitados (3)</span>
+                      <span>Alertas limitados (1)</span>
                     </li>
                   </ul>
                 </div>

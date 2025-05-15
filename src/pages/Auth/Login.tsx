@@ -59,17 +59,29 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await login(loginForm.email, loginForm.password);
-      navigate("/dashboard");
+      // Como esta é uma demo, simularemos um login bem-sucedido
+      // sem fazer uma chamada real à API
+      console.log("Simulando login para:", loginForm.email);
+      
+      // await login(loginForm.email, loginForm.password);
+      
+      // Simulando sucesso após 1 segundo
+      setTimeout(() => {
+        toast({
+          title: "Login bem-sucedido!",
+          description: "Bem-vindo de volta à plataforma TradeMaster.",
+        });
+        navigate("/dashboard");
+        setIsLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Erro no login: ", error);
+      setIsLoading(false);
       toast({
         title: "Erro ao fazer login",
         description: "Verifique suas credenciais e tente novamente.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -88,22 +100,37 @@ const Login: React.FC = () => {
     }
 
     try {
-      await register(registerForm.name, registerForm.email, registerForm.password);
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Bem-vindo(a) à plataforma TradeMaster.",
-      });
-      navigate("/dashboard");
+      // Como esta é uma demo, simularemos um registro bem-sucedido
+      // sem fazer uma chamada real à API
+      console.log("Simulando registro para:", registerForm.email);
+      
+      // await register(registerForm.name, registerForm.email, registerForm.password);
+      
+      // Simulando sucesso após 1 segundo
+      setTimeout(() => {
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Bem-vindo(a) à plataforma TradeMaster.",
+        });
+        navigate("/dashboard");
+        setIsLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Erro no registro: ", error);
+      setIsLoading(false);
       toast({
         title: "Erro ao criar conta",
         description: "Tente novamente mais tarde ou entre em contato com o suporte.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  const handleSocialAuth = (provider: string) => {
+    toast({
+      title: `Autenticação com ${provider}`,
+      description: "Esta funcionalidade está em desenvolvimento e estará disponível em breve.",
+    });
   };
 
   return (
@@ -157,7 +184,10 @@ const Login: React.FC = () => {
                         <button
                           type="button"
                           className="text-xs text-primary hover:underline"
-                          onClick={() => alert("Funcionalidade em desenvolvimento")}
+                          onClick={() => toast({
+                            title: "Recuperação de senha",
+                            description: "Funcionalidade em desenvolvimento. Estará disponível em breve."
+                          })}
                         >
                           Esqueceu a senha?
                         </button>
@@ -327,14 +357,16 @@ const Login: React.FC = () => {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => alert("Funcionalidade em desenvolvimento")}
+                    onClick={() => handleSocialAuth('Google')}
+                    type="button"
                   >
                     Google
                   </Button>
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => alert("Funcionalidade em desenvolvimento")}
+                    onClick={() => handleSocialAuth('GitHub')}
+                    type="button"
                   >
                     GitHub
                   </Button>
