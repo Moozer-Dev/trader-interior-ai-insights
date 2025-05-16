@@ -12,7 +12,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { LineChart, Menu, X, Shield } from "lucide-react";
+import { LineChart, Menu, X, Shield, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> = ({
   onLoginClick,
@@ -21,6 +22,7 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { totalItems } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,6 +92,18 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
+                <Link to="/products">
+                  <NavigationMenuLink 
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      isActive("/products") ? "bg-muted text-primary" : ""
+                    )}
+                  >
+                    Produtos
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
                 <NavigationMenuTrigger className={isActive("/blog") ? "bg-muted text-primary" : ""}>
                   Blog
                 </NavigationMenuTrigger>
@@ -154,6 +168,16 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
           </NavigationMenu>
 
           <div className="ml-4 flex items-center space-x-2">
+            <Link to="/products">
+              <Button variant="ghost" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Button variant="outline" onClick={onLoginClick}>
               Entrar
             </Button>
@@ -164,7 +188,17 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
         </div>
 
         {/* Mobile menu button */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center">
+          <Link to="/products" className="mr-2">
+            <Button variant="ghost" size="icon" className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
+          </Link>
           <Button 
             variant="ghost" 
             size="icon" 
@@ -201,6 +235,15 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
               )}
             >
               Sobre
+            </Link>
+            <Link 
+              to="/products" 
+              className={cn(
+                "px-4 py-2 rounded-md transition-colors",
+                isActive("/products") ? "bg-muted text-primary font-medium" : "hover:bg-muted/50"
+              )}
+            >
+              Produtos
             </Link>
             <Link 
               to="/blog" 

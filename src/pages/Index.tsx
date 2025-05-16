@@ -3,11 +3,16 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BarChart, LineChart, PieChart, Shield, Star, Zap } from 'lucide-react';
+import { ArrowRight, BarChart, LineChart, PieChart, Shield, Star, Zap, ShoppingCart } from 'lucide-react';
 import MainNav from '@/components/layout/MainNav';
+import { getFeaturedProducts } from '@/data/products';
+import ProductCard from '@/components/products/ProductCard';
+import { useCart } from '@/contexts/CartContext';
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
+  const featuredProducts = getFeaturedProducts();
+  const { totalItems } = useCart();
 
   const handleLoginClick = () => {
     navigate('/auth/login');
@@ -33,9 +38,14 @@ const Index: React.FC = () => {
             <p className="text-xl md:text-2xl mb-10 text-gray-700 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
               A plataforma completa para análise de investimentos, com dados em tempo real, alertas personalizados e insights de IA.
             </p>
-            <Button size="lg" className="animate-pulse" onClick={() => navigate('/auth/login?tab=register')}>
-              Experimentar Agora <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button size="lg" onClick={() => navigate('/products')}>
+                Ver Produtos <ShoppingCart className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="lg" onClick={handleAdminClick}>
+                Acesso Admin <Shield className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -72,8 +82,32 @@ const Index: React.FC = () => {
           </div>
         </section>
 
-        {/* Dashboard Preview */}
+        {/* Featured Products */}
         <section className="py-16 px-4 bg-gray-50">
+          <div className="container mx-auto">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold">Produtos em Destaque</h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/products')}
+                  className="flex items-center"
+                >
+                  Ver todos <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {featuredProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Dashboard Preview */}
+        <section className="py-16 px-4 bg-white">
           <div className="container mx-auto text-center">
             <h2 className="text-3xl font-bold mb-12">Dashboard Preview</h2>
             
@@ -106,15 +140,15 @@ const Index: React.FC = () => {
             <Button 
               size="lg" 
               className="bg-primary hover:bg-primary/90"
-              onClick={() => navigate('/auth/login?tab=register')}
+              onClick={() => navigate('/auth/login')}
             >
-              Comece a usar agora <ArrowRight className="ml-2 h-5 w-5" />
+              Acessar Dashboard <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </section>
 
         {/* About Section */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4 bg-gray-50">
           <div className="container mx-auto">
             <div className="flex flex-col md:flex-row items-center gap-12">
               <div className="md:w-1/2 animate-fade-in" style={{ animationDelay: "0.3s" }}>
@@ -129,7 +163,7 @@ const Index: React.FC = () => {
                 </p>
                 <Button 
                   className="bg-primary hover:bg-primary/90"
-                  onClick={() => navigate('/auth/login?tab=register')}
+                  onClick={() => navigate('/about')}
                 >
                   Saiba mais sobre nossa tecnologia
                 </Button>
@@ -148,7 +182,7 @@ const Index: React.FC = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-white">
           <div className="container mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">O que nossos clientes dizem</h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
@@ -219,134 +253,6 @@ const Index: React.FC = () => {
           </div>
         </section>
 
-        {/* Pricing */}
-        <section className="py-16 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">Planos para todos os investidores</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Plano Gratuito */}
-              <Card className="overflow-hidden transition-all hover:shadow-md">
-                <div className="p-6 bg-white">
-                  <h3 className="text-2xl font-bold mb-2">Plano Grátis</h3>
-                  <p className="text-gray-500 mb-4">Para investidores iniciantes</p>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">R$ 0</span>
-                    <span className="text-gray-500">/mês</span>
-                  </div>
-                  <Button 
-                    className="w-full mb-6"
-                    onClick={() => navigate('/auth/login?tab=register')}
-                  >
-                    Começar Grátis
-                  </Button>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Cotações com atraso de 1 dia</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Acesso às informações básicas</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Portfólio limitado (2 ativos)</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Alertas limitados (1)</span>
-                    </li>
-                  </ul>
-                </div>
-              </Card>
-              
-              {/* Plano Pro */}
-              <Card className="overflow-hidden border-primary transition-all hover:shadow-md relative">
-                <div className="absolute top-0 right-0 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-bl">
-                  Popular
-                </div>
-                <div className="p-6 bg-white">
-                  <h3 className="text-2xl font-bold mb-2">Plano Pro</h3>
-                  <p className="text-gray-500 mb-4">Para investidores ativos</p>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">R$ 39,90</span>
-                    <span className="text-gray-500">/mês</span>
-                  </div>
-                  <Button 
-                    className="w-full mb-6 bg-primary hover:bg-primary/90"
-                    onClick={() => navigate('/auth/login?tab=register')}
-                  >
-                    Assinar Pro
-                  </Button>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center">
-                      <Shield className="h-4 w-4 text-primary mr-2" />
-                      <span>Cotações em tempo real</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Shield className="h-4 w-4 text-primary mr-2" />
-                      <span>Análises fundamentalistas</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Shield className="h-4 w-4 text-primary mr-2" />
-                      <span>Portfólio ilimitado</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Shield className="h-4 w-4 text-primary mr-2" />
-                      <span>Alertas ilimitados</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Shield className="h-4 w-4 text-primary mr-2" />
-                      <span>Suporte prioritário</span>
-                    </li>
-                  </ul>
-                </div>
-              </Card>
-              
-              {/* Plano API */}
-              <Card className="overflow-hidden transition-all hover:shadow-md">
-                <div className="p-6 bg-white">
-                  <h3 className="text-2xl font-bold mb-2">Plano API</h3>
-                  <p className="text-gray-500 mb-4">Para desenvolvedores</p>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">R$ 99,90</span>
-                    <span className="text-gray-500">/mês</span>
-                  </div>
-                  <Button 
-                    className="w-full mb-6"
-                    onClick={() => navigate('/auth/login?tab=register')}
-                  >
-                    Assinar API
-                  </Button>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Todos os recursos do Pro</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>API para integração</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>10.000 requisições por dia</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Suporte técnico dedicado</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Star className="h-4 w-4 text-primary mr-2" />
-                      <span>Documentação completa</span>
-                    </li>
-                  </ul>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="bg-gray-900 text-white py-12">
           <div className="container mx-auto px-4">
@@ -366,7 +272,7 @@ const Index: React.FC = () => {
                 <ul className="space-y-2 text-gray-400">
                   <li><a href="/auth/login" className="hover:text-white transition-colors">Dashboard</a></li>
                   <li><a href="/auth/login" className="hover:text-white transition-colors">Análise de Mercado</a></li>
-                  <li><a href="/auth/login" className="hover:text-white transition-colors">Portfólio</a></li>
+                  <li><a href="/products" className="hover:text-white transition-colors">Produtos</a></li>
                   <li><a href="/auth/login" className="hover:text-white transition-colors">Alertas</a></li>
                   <li><a href="/auth/login" className="hover:text-white transition-colors">IA & Insights</a></li>
                 </ul>
