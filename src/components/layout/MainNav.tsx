@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/navigation-menu";
 import { LineChart, Menu, X, Shield, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> = ({
   onLoginClick,
@@ -22,7 +24,10 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { totalItems } = useCart();
+  const { toast } = useToast();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +42,15 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
   }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Handler for clicking the admin button
+  const handleAdminClick = () => {
+    if (isAuthenticated && isAdmin) {
+      navigate('/admin/users');
+    } else {
+      onAdminClick();
+    }
+  };
 
   return (
     <header
@@ -178,10 +192,23 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
                 )}
               </Button>
             </Link>
-            <Button variant="outline" onClick={onLoginClick}>
-              Entrar
-            </Button>
-            <Button onClick={onAdminClick} className="flex items-center">
+            
+            {isAuthenticated ? (
+              <Button variant="outline" onClick={() => {
+                logout();
+                toast({
+                  description: "Você saiu da sua conta com sucesso"
+                });
+              }}>
+                Sair
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={onLoginClick}>
+                Entrar
+              </Button>
+            )}
+            
+            <Button onClick={handleAdminClick} className="flex items-center">
               <Shield className="mr-2 h-4 w-4" /> Admin
             </Button>
           </div>
@@ -264,10 +291,21 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
               Contato
             </Link>
             <div className="pt-3 border-t border-gray-200">
-              <Button variant="outline" onClick={onLoginClick} className="w-full mb-2">
-                Entrar
-              </Button>
-              <Button onClick={onAdminClick} className="w-full flex items-center justify-center">
+              {isAuthenticated ? (
+                <Button variant="outline" onClick={() => {
+                  logout();
+                  toast({
+                    description: "Você saiu da sua conta com sucesso"
+                  });
+                }} className="w-full mb-2">
+                  Sair
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={onLoginClick} className="w-full mb-2">
+                  Entrar
+                </Button>
+              )}
+              <Button onClick={handleAdminClick} className="w-full flex items-center justify-center">
                 <Shield className="mr-2 h-4 w-4" /> Admin
               </Button>
             </div>

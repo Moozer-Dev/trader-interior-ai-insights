@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,9 +40,6 @@ const Index: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button size="lg" onClick={() => navigate('/products')}>
                 Ver Produtos <ShoppingCart className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" onClick={handleAdminClick}>
-                Acesso Admin <Shield className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
