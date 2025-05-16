@@ -17,7 +17,12 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
-const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> = ({
+interface MainNavProps {
+  onLoginClick: () => void;
+  onAdminClick: () => void;
+}
+
+const MainNav: React.FC<MainNavProps> = ({
   onLoginClick,
   onAdminClick,
 }) => {
@@ -73,7 +78,7 @@ const MainNav: React.FC<{ onLoginClick: () => void; onAdminClick: () => void }> 
             "font-bold text-xl transition-colors",
             isScrolled ? "text-gray-800" : "text-gray-800"
           )}>
-            TradeMaster
+            Trader Interior
           </span>
         </Link>
 

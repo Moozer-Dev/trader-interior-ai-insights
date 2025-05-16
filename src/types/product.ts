@@ -8,9 +8,5 @@ export interface Product {
   category: string;
   inStock: boolean;
   featured?: boolean;
-}
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
+  affiliateLink?: string;
 }

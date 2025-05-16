@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -102,47 +103,6 @@ const Index: React.FC = () => {
           </div>
         </section>
 
-        {/* Dashboard Preview */}
-        <section className="py-16 px-4 bg-white">
-          <div className="container mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-12">Dashboard Preview</h2>
-            
-            <div className="rounded-lg overflow-hidden shadow-xl mb-8 max-w-4xl mx-auto animate-fade-in">
-              <div className="bg-white p-4 border-b flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-                    <span>T</span>
-                  </div>
-                  <span className="font-medium">TradeMaster Analytics</span>
-                </div>
-                <div className="flex space-x-3">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-              </div>
-              <div className="bg-white p-0">
-                <img 
-                  src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&auto=format&fit=crop"
-                  alt="Dashboard Preview" 
-                  className="w-full h-auto max-h-[400px] object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80";
-                  }}
-                />
-              </div>
-            </div>
-            
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90"
-              onClick={() => navigate('/auth/login')}
-            >
-              Acessar Dashboard <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        </section>
-
         {/* About Section */}
         <section className="py-16 px-4 bg-gray-50">
           <div className="container mx-auto">
@@ -150,7 +110,7 @@ const Index: React.FC = () => {
               <div className="md:w-1/2 animate-fade-in" style={{ animationDelay: "0.3s" }}>
                 <h2 className="text-3xl font-bold mb-6">Tecnologia de ponta para seus investimentos</h2>
                 <p className="text-lg text-gray-700 mb-6">
-                  Com a TradeMaster, você tem acesso a uma plataforma de análise de investimentos construída com 
+                  Com a Trader Interior, você tem acesso a uma plataforma de análise de investimentos construída com 
                   as mais modernas tecnologias de inteligência artificial e ciência de dados.
                 </p>
                 <p className="text-lg text-gray-700 mb-6">
@@ -182,7 +142,7 @@ const Index: React.FC = () => {
           <div className="container mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">O que nossos clientes dizem</h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-              Junte-se a milhares de investidores que transformaram suas estratégias de investimento com a TradeMaster.
+              Junte-se a milhares de investidores que transformaram suas estratégias de investimento com a Trader Interior.
             </p>
           </div>
           
@@ -195,7 +155,7 @@ const Index: React.FC = () => {
                   ))}
                 </div>
                 <p className="text-gray-700 mb-6 italic">
-                  "A TradeMaster revolucionou minha forma de investir. As análises de IA são impressionantes e me ajudaram a tomar decisões muito mais fundamentadas."
+                  "A Trader Interior revolucionou minha forma de investir. As análises de IA são impressionantes e me ajudaram a tomar decisões muito mais fundamentadas."
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-gray-300 mr-4"></div>
@@ -256,7 +216,7 @@ const Index: React.FC = () => {
               <div>
                 <div className="flex items-center mb-4">
                   <LineChart className="h-6 w-6 text-primary mr-2" />
-                  <span className="font-bold text-xl">TradeMaster</span>
+                  <span className="font-bold text-xl">Trader Interior</span>
                 </div>
                 <p className="text-gray-400 text-sm">
                   Plataforma completa para análise de investimentos com IA.
@@ -295,7 +255,7 @@ const Index: React.FC = () => {
             </div>
             
             <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} TradeMaster. Todos os direitos reservados.
+              &copy; {new Date().getFullYear()} Trader Interior. Todos os direitos reservados.
             </div>
           </div>
         </footer>

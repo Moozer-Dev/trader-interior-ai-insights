@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Product } from '@/types/product';
 import { useCart } from '@/contexts/CartContext';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ExternalLink } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -16,19 +16,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   
   const handleViewDetails = () => {
-    navigate(`/products/${product.id}`);
+    if (product.affiliateLink) {
+      window.open(product.affiliateLink, '_blank');
+    } else {
+      navigate(`/products/${product.id}`);
+    }
   };
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(product);
+    if (product.affiliateLink) {
+      window.open(product.affiliateLink, '_blank');
+    } else {
+      addToCart(product);
+    }
   };
 
   // Format price
-  const formattedPrice = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(product.price);
+  const formattedPrice = product.price === 0 ? 
+    "Gratuito" : 
+    new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(product.price);
 
   return (
     <Card 
@@ -72,8 +82,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             disabled={!product.inStock}
             className="flex items-center"
           >
-            <ShoppingCart className="h-4 w-4 mr-1" />
-            Adicionar
+            {product.affiliateLink ? (
+              <>
+                <ExternalLink className="h-4 w-4 mr-1" />
+                Acessar
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-1" />
+                Adicionar
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

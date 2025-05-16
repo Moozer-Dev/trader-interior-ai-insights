@@ -4,78 +4,36 @@ import { Product } from '@/types/product';
 export const products: Product[] = [
   {
     id: 1,
-    name: "Curso Análise Técnica",
-    description: "Curso completo de análise técnica para investidores iniciantes e intermediários.",
-    price: 297.00,
+    name: "Link de Afiliado ActivTrades",
+    description: "Cadastre-se na Corretora ActivTrades usando meu link e tenha acesso às melhores condições para operar no mercado financeiro.",
+    price: 0.00,
     image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&auto=format&fit=crop",
-    category: "cursos",
+    category: "afiliado",
     inStock: true,
-    featured: true
+    featured: true,
+    affiliateLink: "https://secure.activtrades.com/personalarea/s/7674AC1D"
   },
   {
     id: 2,
-    name: "Mentoria de Investimentos",
-    description: "Mentoria personalizada para desenvolvimento de estratégias de investimento.",
-    price: 1997.00,
+    name: "Curso Finanças Pessoais",
+    description: "Aprenda como organizar suas finanças pessoais de forma eficiente e prática, construindo uma base sólida para seus investimentos.",
+    price: 97.00,
     image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80",
-    category: "mentorias",
-    inStock: true
+    category: "cursos",
+    inStock: true,
+    featured: true,
+    affiliateLink: "https://go.hotmart.com/M87827482W?dp=1"
   },
   {
     id: 3,
-    name: "E-book Fundamentos do Mercado",
-    description: "Guia completo sobre os fundamentos do mercado financeiro.",
+    name: "E-book Guia Completo sobre Fundos Imobiliários",
+    description: "Investir com inteligência e diversificação: um guia completo para entender e investir em fundos imobiliários no mercado brasileiro.",
     price: 49.90,
     image: "https://images.unsplash.com/photo-1553729784-e91953dec042?auto=format&fit=crop&q=80",
     category: "ebooks",
     inStock: true,
-    featured: true
-  },
-  {
-    id: 4,
-    name: "Software de Análise TradeMaster Pro",
-    description: "Software profissional para análise de mercado com indicadores exclusivos.",
-    price: 499.00,
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&auto=format&fit=crop",
-    category: "softwares",
-    inStock: true
-  },
-  {
-    id: 5,
-    name: "Workshop Gestão de Risco",
-    description: "Workshop intensivo sobre gestão de risco em operações financeiras.",
-    price: 197.00,
-    image: "https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&q=80",
-    category: "workshops",
-    inStock: true
-  },
-  {
-    id: 6,
-    name: "Assinatura Premium",
-    description: "Acesso ilimitado a todos os cursos e materiais da plataforma.",
-    price: 997.00,
-    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80",
-    category: "assinaturas",
-    inStock: true,
-    featured: true
-  },
-  {
-    id: 7,
-    name: "E-book Análise Fundamentalista",
-    description: "Guia prático para análise fundamentalista de ações.",
-    price: 49.90,
-    image: "https://images.unsplash.com/photo-1553729784-e91953dec042?auto=format&fit=crop&q=80",
-    category: "ebooks",
-    inStock: true
-  },
-  {
-    id: 8,
-    name: "Curso Day Trade",
-    description: "Estratégias avançadas para day trade nos mercados financeiros.",
-    price: 397.00,
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&auto=format&fit=crop",
-    category: "cursos",
-    inStock: true
+    featured: true,
+    affiliateLink: "https://pay.hotmart.com/H88071071F?off=hcfn3g3j&_hi=eyJjaWQiOiIxNzQ3MTUxNDkzODA4NTgzNzIzMTkwOTEyOTU3NjAwIiwiYmlkIjoiMTc0NzE1MTQ5MzgwODU4MzcyMzE5MDkxMjk1NzYwMCIsInNpZCI6ImRjOTcwN2I4Njg1ZDRiOTFhOGJhNGM2MmRkMDRjNmYxIn0=.1747403319957"
   }
 ];
 

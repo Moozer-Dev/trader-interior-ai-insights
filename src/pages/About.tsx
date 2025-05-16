@@ -25,13 +25,13 @@ const About: React.FC = () => {
       <div className="pt-28 pb-16 px-4">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold mb-6">Sobre a TradeMaster</h1>
+            <h1 className="text-4xl font-bold mb-6">Sobre a Trader Interior</h1>
             
             {/* Mission */}
             <section className="mb-12">
               <h2 className="text-2xl font-semibold mb-4">Nossa Missão</h2>
               <p className="text-lg text-gray-700 mb-6">
-                Na TradeMaster, nossa missão é democratizar o acesso a ferramentas avançadas de análise financeira, 
+                Na Trader Interior, nossa missão é democratizar o acesso a ferramentas avançadas de análise financeira, 
                 tornando a tecnologia de ponta acessível a investidores de todos os níveis.
               </p>
               <p className="text-lg text-gray-700">
@@ -44,16 +44,15 @@ const About: React.FC = () => {
             <section className="mb-12">
               <h2 className="text-2xl font-semibold mb-4">Nossa História</h2>
               <p className="text-lg text-gray-700 mb-4">
-                A TradeMaster foi fundada em 2020 por um grupo de especialistas em finanças e tecnologia que 
-                identificaram uma lacuna no mercado: ferramentas avançadas de análise financeira eram acessíveis 
-                apenas a grandes instituições e investidores de alto patrimônio.
+                A Trader Interior foi fundada por Moozer Charles com o objetivo de tornar ferramentas avançadas 
+                de análise financeira acessíveis a todos os investidores, não apenas às grandes instituições.
               </p>
               <p className="text-lg text-gray-700 mb-4">
                 Começamos com uma visão clara: criar uma plataforma que combinasse análise técnica sofisticada, 
                 inteligência artificial e uma experiência de usuário intuitiva, tudo a um preço acessível.
               </p>
               <p className="text-lg text-gray-700">
-                Hoje, atendemos milhares de investidores em todo o Brasil, desde iniciantes até profissionais, 
+                Hoje, atendemos investidores em todo o Brasil, desde iniciantes até profissionais, 
                 ajudando-os a navegar pelos mercados financeiros com confiança e precisão.
               </p>
             </section>
@@ -61,24 +60,15 @@ const About: React.FC = () => {
             {/* Team */}
             <section className="mb-12">
               <h2 className="text-2xl font-semibold mb-6">Nossa Equipe</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-8">
                 <div className="bg-white p-6 rounded-lg shadow-md">
                   <div className="w-20 h-20 bg-gray-200 rounded-full mb-4 mx-auto"></div>
-                  <h3 className="text-xl font-medium text-center mb-2">Carlos Silva</h3>
+                  <h3 className="text-xl font-medium text-center mb-2">Moozer Charles</h3>
                   <p className="text-primary text-center mb-4">CEO & Fundador</p>
                   <p className="text-gray-600">
-                    Ex-analista de investimentos com mais de 15 anos de experiência em mercados financeiros. 
-                    Carlos lidera a visão estratégica da TradeMaster.
-                  </p>
-                </div>
-                
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <div className="w-20 h-20 bg-gray-200 rounded-full mb-4 mx-auto"></div>
-                  <h3 className="text-xl font-medium text-center mb-2">Ana Mendes</h3>
-                  <p className="text-primary text-center mb-4">CTO</p>
-                  <p className="text-gray-600">
-                    Especialista em IA e machine learning, Ana lidera o desenvolvimento das tecnologias 
-                    preditivas que são o coração da nossa plataforma.
+                    Especialista em análise de investimentos com vasta experiência em mercados financeiros. 
+                    Moozer lidera a visão estratégica da Trader Interior, combinando conhecimento técnico com uma abordagem 
+                    inovadora para democratizar o acesso a ferramentas avançadas de trading.
                   </p>
                 </div>
               </div>
@@ -143,7 +133,7 @@ const About: React.FC = () => {
               <h2 className="text-2xl font-semibold mb-4">Comece sua jornada de investimento hoje</h2>
               <p className="text-lg text-gray-700 mb-6 max-w-2xl mx-auto">
                 Junte-se a milhares de investidores que estão transformando sua abordagem de investimento com 
-                as ferramentas de análise e insights da TradeMaster.
+                as ferramentas de análise e insights da Trader Interior.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button size="lg" onClick={() => navigate('/products')}>
