@@ -10,3 +10,8 @@ export interface Product {
   featured?: boolean;
   affiliateLink?: string;
 }
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
